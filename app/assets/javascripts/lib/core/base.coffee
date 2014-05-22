@@ -1,11 +1,11 @@
-define( ['jquery', 'lib/core/authenticator','lib/core/shopping_cart', 'lib/core/msg', 'lib/utils/local_store', 'lib/managers/select_group_manager', 'lib/core/ad_manager_v2', 'lib/utils/swipe'], ($, Authenticator, ShoppingCart, Msg, LocalStore, SelectGroupManager, AdManager, Swipe) ->
+define( ['jquery', 'lib/core/authenticator','lib/core/shopping_cart', 'lib/core/cookie_message', 'lib/utils/local_store', 'lib/managers/select_group_manager', 'lib/core/ad_manager_v2', 'lib/utils/swipe'], ($, Authenticator, ShoppingCart, CookieMessage, LocalStore, SelectGroupManager, AdManager, Swipe) ->
 
   class Base
 
     constructor: (args={})->
       @showUserBasket()
       @initAds() unless args.secure
-      @showCookieComplianceMsg()
+      @showCookieMessage()
       @initialiseSelectGroupManager()
       @addNavTracking()
       @initSwipe()
@@ -20,21 +20,11 @@ define( ['jquery', 'lib/core/authenticator','lib/core/shopping_cart', 'lib/core/
     initialiseSelectGroupManager: ->
       new SelectGroupManager()
 
-    showCookieComplianceMsg: ->
+    showCookieMessage: ->
       if LocalStore.get('cookie-compliance') is undefined or LocalStore.get('cookie-compliance') is null
-        args =
+        new CookieMessage({
           content: "<p class='cookie-text'><strong>Hi there,</strong> we use cookies to improve your experience on our website. You can <a class='cookie-link' href='http://www.lonelyplanet.com/legal/cookies'>update your settings</a> by clicking the Cookie Policy link at the bottom of the page.</p>"
-          style: "row--cookie-compliance js-cookie-compliance"
-          userOptions :
-            close: true
-            more: true
-          delegate:
-            onRemove : ->
-              $('div.js-cookie-compliance').removeClass('is-open')
-              $('div.js-cookie-compliance').addClass('is-closed')
-            onAdd : ->
-              window.setTimeout( ( => $('div.js-cookie-compliance').addClass('is-open')), 1)
-        msg = new Msg(args)
+        })
         LocalStore.set('cookie-compliance', true)
 
     addNavTracking: ->
