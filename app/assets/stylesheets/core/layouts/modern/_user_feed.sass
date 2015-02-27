@@ -1,0 +1,112 @@
+// ----------------------------------------------------------------------------
+//
+// User Feed Menu
+//
+// ----------------------------------------------------------------------------
+
+.user-feed,
+  left: -200px
+  cursor: default
+  width: 360px
+
+.user-feed__container
+  +css-arrow(top, 30px, 317px)
+
+.user-feed__header
+  position: relative
+  padding: 20px 15px
+
+.user-feed__username
+  +font-size(22)
+  font-weight: bold
+  color: $titlegray
+
+.user-feed__email
+  +font-size(17)
+  padding-top: 5px
+  color: $titlegray
+  font-weight: normal
+
+.user-feed__buttons
+  padding-top: 15px
+  .btn
+    +font-size(13)
+    line-height: 13px
+    text-transform: uppercase
+    padding: 9px 0 8px
+  .btn--subtle
+    padding: 7px 0 6px
+  .icon--settings
+    +size(28px)
+    position: absolute
+    top: 14px
+    right: 14px
+
+.user-feed__content
+  .nav__tabs__content
+    overflow-y: auto
+    min-height: 77px // empty list height
+    border-radius: 0 0 4px 4px // prevent hover highlight from making square corners
+  .ie7 &,
+  .ie8 &
+    display: none
+
+.user-feed__content__unread-count
+  font-weight: normal
+  color: $grey-highlight
+
+.user-feed__list
+  display: none
+  list-style: none
+  &.is-active
+    display: block
+  .activity-list__item
+    +font-size(14)
+    position: relative
+    margin: 0
+    border-bottom: 1px solid $body-background
+    cursor: pointer
+    font-weight: normal
+    color: $titlegray
+    &.is-highlighted
+      background: mix($linkblue, #fff, 3%)
+    &:hover
+      background: mix($linkblue, #fff, 10%)
+    &, &:first-of-type // because it gets overwritten in Community
+      padding: 15px $primary-nav-height 30px 15px
+      min-height: 20px
+    &:last-child
+      border-bottom: 0
+      border-radius: 0 0 4px 4px
+    .activity-list__activity-content
+      display: block
+      padding-bottom: 5px
+    .activity-list__time
+      position: absolute
+      bottom: 15px
+      left: 15px
+      color: $bodygray
+      &:before
+        +size(1.1em)
+        display: inline-block
+        margin: -0.2em 0.2em 0 0
+        vertical-align: middle
+
+    .activity-list__link
+      font-weight: bold
+      color: $titlegray
+
+  .activity-list__avatar
+    +user-avatar-size(35)
+    position: absolute
+    right: 15px
+    margin: 0
+
+.user-feed__footer
+  padding: 18px 15px 13px
+
+.activity-list__item--empty
+  +font-size(16)
+  padding: 30px 0
+  text-align: center
+  color: $lightgray

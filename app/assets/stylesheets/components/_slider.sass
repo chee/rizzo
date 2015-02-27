@@ -1,35 +1,32 @@
 // -----------------------------------------------------------------------------
-// Slider Style Gallery
-// Note: the height/width for the slider, and the position of the controls needs
-//       to be defined wherever it's implemented.
+// Slider
 // -----------------------------------------------------------------------------
-
-$chevronOffset: 0.35em
-$slideOffset: -5.4em
-$slideHoverOffset: -0.714em
-$slidePadding: 3.357em
-$slideHoverPadding: 2.857em
-$slideArrowSpacing: 1.786em
-$slideHoverArrowSpacing: 0.357em
 
 .slider
   position: relative
 
 .slider__viewport
+  position: relative
   overflow: hidden
 
 .slider__container
   @extend %transition--base
   -ms-scroll-chaining: none
-  height: 100%
   position: relative
+
+  .slider--16x9 &
+    +intrinsic-ratio(16, 9)
+
+  .slider--4x3 &
+    +intrinsic-ratio(4, 3)
 
 .slider__slide
   +hardware-acceleration()
-  display: none
   position: absolute
-  transition: transform .2s ease-in-out, left .2s ease-in-out
+  top: 0
+  display: none
   width: 100%
+  height: 100%
   &.is-previous-previous,
   &.is-previous,
   &.is-next,
@@ -62,32 +59,40 @@ $slideHoverArrowSpacing: 0.357em
       left: 200%
 
 .slider__img
-  min-width: 100%
+  +best-fit-media
+
+.slider__img--portrait
+  .no-transform-support &, .supports-transform &
+    width: auto
+    height: 100%
 
 .slider__controls-container
-  position: relative
-  &:hover
-    .slider__controls
-      opacity: 1
-
-.slider__controls
   @extend %clearfix
   @extend %transition--base
   +z-layer(top)
   position: absolute
+  overflow: hidden
+  display: none
   width: 100%
+  height: 100%
+  &.is-shown
+    display: block
 
 .slider__control
   +font-size(14)
+  +alpha-background(black, 0.65, $body-copy)
   @extend %transition--base
-  background: $body-copy
-  background: rgba(0,0,0,0.6)
   color: white
   font-weight: bold
   line-height: 1.66em
   opacity: 0.5
-  padding: 0.643em 2.286em 0.643em
+  padding: 10px 40px
+  margin-top: -1.15em
   position: absolute
+  top: 50%
+  border: none
+  outline: none
+
   &:hover
     opacity: 1
     text-decoration: none
@@ -102,49 +107,87 @@ $slideHoverArrowSpacing: 0.357em
     vertical-align: top
 
 .slider__control--prev
-  left: $slideOffset
-  padding-right: $slidePadding
+  left: -70px
+  padding-left: 30px
   &:after
-    right: $chevronOffset
+    right: .35em
   &:hover
-    left: $slideHoverOffset
-    padding-right: $slideHoverPadding
+    left: 0
   .at-beginning &
-    cursor: normal
-    pointer-events: none
-    opacity: 0
-
+    display: none
 
 .slider__control--next
-  right: $slideOffset
-  padding-left: $slidePadding
+  right: -70px
+  padding-right: 30px
   &:before
-    left: $chevronOffset
+    left: .35em
   &:hover
-    right: $slideHoverOffset
-    padding-left: $slideHoverPadding
+    right: 0
   .at-end &
-    cursor: normal
-    pointer-events: none
-    opacity: 0
+    display: none
 
 .slider__pagination
   bottom: 0
-  display: inline-block
-  margin: 25px auto 0
+  position: absolute
   text-align: center
   width: 100%
-  +z-layer(top)
-
 .slider__pagination--link
-  @extend %image-replacement
-  border-radius: 3px
-  background: $details-panel-border
+  @extend %transition--base
+  +size(6px)
+  background: $bodygray
+  border-radius: 6px
   display: inline-block
-  height: 7px
-  margin: 0 3px
-  width: 7px
-  color: $lpblue
-
-  &:hover, &.is-active
+  margin: 5px
+  &.is-current
     background: $linkblue
+
+.slider__thumbs
+  +z-layer(top)
+  +alpha-background(black,0.8,black)
+  transition: 1s height ease-in, 1s opacity ease-in
+  position: absolute
+  bottom: 0
+  height: 0
+  width: 100%
+  text-align: center
+  opacity: 0
+  &.is-ready
+    height: 60px
+    opacity: 1
+
+.slider__thumbs__list
+  height: 70px
+  margin: 5px 25px 0
+  overflow: hidden
+  white-space: nowrap
+  -ms-overflow-style: none
+  .ie8 &,.ie9 &
+    overflow-x: hidden
+
+.slider__thumb__link
+  display: inline-block
+  margin: 0 2px
+  background-color: #000
+  outline: none !important
+
+.slider__thumb
+  height: 50px
+  opacity: 0.5
+  &:hover,
+  &.is-current
+    opacity: 1
+
+.slider__thumb__arrow
+  @extend %image-replacement
+  position: absolute
+  top: 50%
+  height: 15px
+  width: 15px
+  margin-top: -7px
+  outline: none !important
+  &:hover
+    +icon-color(white)
+  &.icon--chevron-right
+    right: 6px
+  &.icon--chevron-left
+    left: 6px

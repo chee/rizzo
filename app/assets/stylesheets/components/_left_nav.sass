@@ -7,10 +7,12 @@
 
 .nav--left
   display: table-cell
+  float: left
+  width: 182px
+  margin-left: 10px
   margin-right: 10px
   padding-right: 10px
   vertical-align: top
-  width: 182px
 
   .ie7 &
     display: block
@@ -30,10 +32,15 @@
   line-height: 1.2em
   padding: 12px 25px 12px 15px
   position: relative
-  border-bottom: 1px solid $subduedgray
+  border-bottom: 1px solid rgba($subduedgray,.5)
   &:hover
     text-decoration: none
-    background-color: $body-background-offset
+    background-color: mix($lpblue,#fff,2%)
+
+  &:focus
+    outline: 0
+    background-color: mix($lpblue,#fff,10%)
+    border-left: 1px dotted $lpblue
 
   &:after
     height: 10px
@@ -45,11 +52,14 @@
 
   &:last-child
     border-bottom: none
+    border-radius: 0 0 4px 4px
+
+  &.disabled
+    color: $disabled
+    cursor: auto
+    opacity: 0.4
 
   &.is-active
-    font-weight: bold
-    &:after
-      +icon-color(white)
     &, &:hover
       @extend %active-background
 
@@ -72,29 +82,29 @@
 
 .nav--left__group
   @extend %rounded-corners
-  padding: 5px 0
 
 .nav--left__group--linked
   margin-top: 10px
   position: relative
 
-  &:before, &:after
-    +z-layer(middle)
-    @extend %empty-abs-generated-content
-    background-color: $body-background
-    height: 10px
-    bottom: 100%
+  .enhanced &
+    &:before, &:after
+      +z-layer(middle)
+      @extend %empty-abs-generated-content
+      background-color: $body-background
+      height: 10px
+      bottom: 100%
 
-  &:before
-    border-radius: 0 4px 4px 0
-    box-shadow: 15px 0 0 #fff
-    left: 4px
-    width: 17px
+    &:before
+      border-radius: 0 4px 4px 0
+      box-shadow: 15px 0 0 #fff
+      left: 4px
+      width: 17px
 
-  &:after
-    border-radius: 4px 0 0 4px
-    right: 4px
-    width: 150px
+    &:after
+      border-radius: 4px 0 0 4px
+      right: 4px
+      width: 150px
 
 
 // -----------------------------------------------------------------------------
@@ -122,6 +132,3 @@
     vertical-align: bottom
     .no-js &, .no-background-size &
       width: 0
-
-  &.is-active:before,
-    +icon-color(white)

@@ -1,2 +1,1 @@
-- properties = properties || {}
-.adunit.adunit--leaderboard{ id: properties[:id] || "js-ad-leaderboard-#{Time.now.to_i}", data: { dimensions: properties[:sizes] || '728x90,970x66,320x50', extension: properties[:extension] || nil, targeting: properties[:targeting] || nil, context: properties[:context] || nil } }
+.adunit.adunit--leaderboard{ data: ad_unit_data(@show_billboard ? 'billboard' : 'leaderboard', defined?(properties) ? properties : nil) }

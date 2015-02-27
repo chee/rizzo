@@ -9,6 +9,9 @@ Rizzo::Application.configure do
   config.active_support.deprecation = :log
 
   config.action_dispatch.best_standards_support = :builtin
-  
+
   config.assets.debug = true
+
+  config.eager_load = false
+
 end if defined?(Rizzo::Application)

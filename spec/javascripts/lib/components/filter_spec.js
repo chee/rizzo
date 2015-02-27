@@ -1,4 +1,4 @@
-require(["public/assets/javascripts/lib/components/filter.js"], function(Filter) {
+define(["public/assets/javascripts/lib/components/filter.js"], function(Filter) {
 
   describe("Filter", function() {
 
@@ -12,12 +12,6 @@ require(["public/assets/javascripts/lib/components/filter.js"], function(Filter)
     var data_alt = {
       disable_price_filters: false
     };
-
-    describe("Object", function() {
-      it("is defined", function() {
-        expect(Filter).toBeDefined();
-      });
-    });
 
     describe("Initialisation", function() {
       beforeEach(function() {
@@ -274,6 +268,8 @@ require(["public/assets/javascripts/lib/components/filter.js"], function(Filter)
     });
 
     describe("on filter input change", function() {
+      var spyEvent, element;
+
       beforeEach(function() {
         loadFixtures("filter.html");
         window.filter = new Filter({
@@ -281,8 +277,8 @@ require(["public/assets/javascripts/lib/components/filter.js"], function(Filter)
         });
         spyOn(filter, "_toggleActiveClass");
         spyOn(filter, "_serialize");
-        var spyEvent = spyOnEvent(filter.$el, ":cards/request");
-        var element = filter.$el.find("input[type=checkbox]");
+        element = filter.$el.find("input[type=checkbox]");
+        spyEvent = spyOnEvent(filter.$el, ":cards/request");
         element.trigger("change");
       });
 
@@ -295,18 +291,20 @@ require(["public/assets/javascripts/lib/components/filter.js"], function(Filter)
       });
 
       it("triggers the page request event", function() {
-        expect(":cards/request").toHaveBeenTriggeredOnAndWith(filter.$el, filter._serialize());
+        expect(spyEvent).toHaveBeenTriggered();
       });
     });
 
     describe("when the user clicks a filter card", function() {
+      var spyEvent;
+
       beforeEach(function() {
         loadFixtures("filter.html");
         window.filter = new Filter({
           el: "#js-filters"
         });
         spyOn(filter, "_set");
-        var spyEvent = spyOnEvent(filter.$el, ":cards/request");
+        spyEvent = spyOnEvent(filter.$el, ":cards/request");
       });
 
       it("calls _set with the new filters", function() {
@@ -319,7 +317,7 @@ require(["public/assets/javascripts/lib/components/filter.js"], function(Filter)
       it("triggers the :cards/request event with the correct params", function() {
         var filterCard = $(LISTENER).find(".js-stack-card-filter");
         filterCard.trigger("click");
-        expect(":cards/request").toHaveBeenTriggeredOn(filter.$el);
+        expect(spyEvent).toHaveBeenTriggered();
       });
     });
 

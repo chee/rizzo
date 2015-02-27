@@ -4,14 +4,14 @@
 //
 // ------------------------------------------------------------------------------
 
-define([ "jquery", "lib/analytics/analytics_auth", "lib/analytics/analytics_perf", "sCode" ], function($, AnalyticsAuth, AnalyticsPerf) {
+define([ "jquery", "sCode" ], function($) {
 
   "use strict";
 
   // @data = {}
-  function Analytics(data) {
-    this.LISTENER = "#js-card-holder";
-    this.config = $.extend({}, data || window.lp.tracking, this._userAuth());
+  function Analytics(data, listener) {
+    this.LISTENER = listener || "#js-card-holder";
+    this.config = $.extend({}, data || window.lp.tracking);
   }
 
   // -------------------------------------------------------------------------
@@ -29,19 +29,29 @@ define([ "jquery", "lib/analytics/analytics_auth", "lib/analytics/analytics_perf
       }
 
       this["_" + analytics.callback].apply(this, args);
-    });
+    }.bind(this));
 
     $listener.on(":cards/append/received", function(e, data, state, analytics) {
       if (analytics) {
         this["_" + analytics.callback](state);
       }
-    });
+    }.bind(this));
 
     $listener.on(":page/received", function(e, data, state, analytics) {
       if (analytics) {
         this["_" + analytics.callback](analytics.url, analytics.stack);
       }
-    });
+    }.bind(this));
+
+    $listener.on(":layer/received", function(e, data) {
+      var title = $(data.content).find("#js-article-title").text();
+      this.track(data.tracking || {
+        eVar7: title,
+        prop11: title,
+        prop41: window.location.pathname
+      }, true);
+    }.bind(this));
+
   };
 
   // -------------------------------------------------------------------------
@@ -92,7 +102,7 @@ define([ "jquery", "lib/analytics/analytics_auth", "lib/analytics/analytics_perf
   };
 
   Analytics.prototype.trackView = function() {
-    this.track(this._pagePerf(), true);
+    this.track();
   };
 
   // -------------------------------------------------------------------------
@@ -125,7 +135,7 @@ define([ "jquery", "lib/analytics/analytics_auth", "lib/analytics/analytics_perf
     var a;
 
     for (a in this.config) {
-      delete window.s[a];
+      window.s[a] = undefined;
     }
     this.config = {};
     for (a in this.prevConfig) {
@@ -135,16 +145,6 @@ define([ "jquery", "lib/analytics/analytics_auth", "lib/analytics/analytics_perf
     this.prevConfig = null;
 
     return true;
-  };
-
-  Analytics.prototype._userAuth = function() {
-    var params = new AnalyticsAuth();
-    return params.get();
-  };
-
-  Analytics.prototype._pagePerf = function() {
-    var params = new AnalyticsPerf();
-    return params.get();
   };
 
   return Analytics;

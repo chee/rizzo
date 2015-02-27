@@ -1,20 +1,30 @@
-require([ "jquery", "public/assets/javascripts/lib/components/lightbox.js" ], function($, LightBox) {
+define([ "jquery", "public/assets/javascripts/lib/components/lightbox.js" ], function($, LightBox) {
 
   "use strict";
 
   describe("LightBox", function() {
 
-    var lightbox;
+    var lightbox,
+        paginationData = {
+          pagination: {
+            next:{
+              url: "url-next",
+              title: "title"
+            },
+            prev:{
+              url: "url-prev",
+              title: "title"
+            }
+          }
+        };
 
     beforeEach(function() {
       loadFixtures("lightbox.html");
-      lightbox = new LightBox({ customClass: "lightbox-foo" });
     });
 
     describe("Initialisation", function() {
-
-      it("is defined", function() {
-        expect(lightbox).toBeDefined();
+      beforeEach(function() {
+        lightbox = new LightBox();
       });
 
       it("found the lightbox", function() {
@@ -22,14 +32,14 @@ require([ "jquery", "public/assets/javascripts/lib/components/lightbox.js" ], fu
       });
 
       it("found the lightbox opener", function() {
-        expect(lightbox.$opener.length).toBe(1);
+        expect(lightbox.opener).toBe(".js-lightbox-toggle");
       });
 
       it("extends the flyout functionality", function() {
         expect(lightbox.listenToFlyout).toBeDefined();
       });
 
-      it("should extend EventEmitter functionality", function() {
+      it("should extend asEventEmitter functionality", function() {
         expect(lightbox.trigger).toBeDefined();
       });
 
@@ -45,23 +55,204 @@ require([ "jquery", "public/assets/javascripts/lib/components/lightbox.js" ], fu
         expect(lightbox._fetchContent).toBeDefined();
       });
 
-      it("sets up the container to be the full height and width of the document", function() {
-        expect($("#js-lightbox").height()).toBe($("body").height());
-        expect($("#js-lightbox").width()).toBe($("body").width());
+    });
+
+    describe("Open/Close", function() {
+
+      describe("with the config from opener", function() {
+        beforeEach(function() {
+          loadFixtures("lightbox.html");
+          jasmine.clock().install();
+          lightbox = new LightBox();
+          spyOn(lightbox, "viewport").and.returnValue({
+            width: 600
+          });
+
+          $("#js-row--content").trigger(":lightbox/open", {
+            opener: lightbox.opener
+          });
+        });
+
+        afterEach(function() {
+          jasmine.clock().uninstall();
+        });
+
+        it("should have css classes", function() {
+          jasmine.clock().tick(301);
+          expect($("#js-lightbox")).toHaveClass("is-active is-visible");
+          expect($("html")).toHaveClass("lightbox--open");
+          // custom class
+          expect($("#js-lightbox")).toHaveClass("lightbox-foo");
+
+        });
+
+        it("shouldn't have preloader", function() {
+          jasmine.clock().tick(301);
+          expect($("#js-lightbox").find(".preloader").length).toBe(0);
+        });
+
+        it("should close and clean the lightbox", function() {
+
+          $("#js-row--content").trigger(":flyout/close");
+          jasmine.clock().tick(301);
+
+          expect($("#js-lightbox")).not.toHaveClass("content-ready");
+          expect($("#js-lightbox")).not.toHaveClass("is-active");
+          expect($("#js-lightbox")).not.toHaveClass("lightbox-foo");
+          expect($("html")).not.toHaveClass("lightbox--open");
+        });
+
+      });
+
+      describe("with the config in constructor", function() {
+        beforeEach(function() {
+          loadFixtures("lightbox.html");
+          jasmine.clock().install();
+          lightbox = new LightBox({
+            showPreloader: true,
+            customClass: "lightbox-bar"
+          });
+          spyOn(lightbox, "viewport").and.returnValue({
+            width: 600
+          });
+
+          $("#js-row--content").trigger(":lightbox/open", {
+            opener: lightbox.opener
+          });
+        });
+
+        afterEach(function() {
+          jasmine.clock().uninstall();
+        });
+
+        it("should have custom css class", function() {
+          jasmine.clock().tick(301);
+          expect($("#js-lightbox")).toHaveClass("lightbox-bar");
+        });
+
+        it("shouldn't have preloader", function() {
+          jasmine.clock().tick(301);
+          expect($("#js-lightbox").find(".preloader").length).toBe(1);
+        });
+
+        it("should close and clean the lightbox", function() {
+
+          $("#js-row--content").trigger(":flyout/close");
+          jasmine.clock().tick(301);
+
+          expect($("#js-lightbox")).not.toHaveClass("content-ready");
+          expect($("#js-lightbox")).not.toHaveClass("is-active");
+          expect($("#js-lightbox")).not.toHaveClass("lightbox-bar");
+          expect($("html")).not.toHaveClass("lightbox--open");
+        });
+
+      });
+
+      describe("with viewport below breakpoint", function() {
+
+        beforeEach(function() {
+          loadFixtures("lightbox.html");
+          jasmine.clock().install();
+          lightbox = new LightBox();
+
+          spyOn(lightbox, "viewport").and.returnValue({ width: 400 });
+        });
+
+        afterEach(function() {
+          jasmine.clock().uninstall();
+        });
+
+        describe("via $opener click", function() {
+          var spyEvent;
+
+          beforeEach(function() {
+            spyEvent = spyOnEvent("#js-row--content", ":lightbox/open");
+            $(".js-lightbox-toggle").trigger("click");
+          });
+
+          it("should not be opened", function() {
+            expect(spyEvent).not.toHaveBeenTriggered();
+          });
+        });
+
+        describe("via ':lightbox/open' event trigger", function() {
+          beforeEach(function() {
+            $("#js-row--content").trigger(":lightbox/open", {
+              opener: lightbox.opener
+            });
+          });
+
+          it("should not be opened", function() {
+            expect($("#js-lightbox")).not.toHaveClass("is-active");
+          });
+        });
+      });
+    });
+
+    describe("Pagination", function() {
+      beforeEach(function() {
+        spyOn(LightBox.prototype, "_navigateTo");
+        lightbox = new LightBox();
+      });
+
+      it("should render pagination on :layer/received", function() {
+        $("#js-card-holder").trigger(":layer/received", paginationData);
+
+        expect($(".js-lightbox-previous").attr("href")).toBe(paginationData.pagination.prev.url);
+        expect($(".js-lightbox-next").attr("href")).toBe(paginationData.pagination.next.url);
+      });
+
+      it("should navigate to some other url with pagination links", function() {
+        $(".js-lightbox-next").trigger("click");
+        expect(lightbox._navigateTo).toHaveBeenCalled();
       });
 
     });
 
     describe("Functionality", function() {
+      beforeEach(function() {
+        jasmine.clock().install();
+        lightbox = new LightBox();
+      });
+
+      afterEach(function() {
+        jasmine.clock().uninstall();
+      });
 
       it("can update the lightbox contents", function() {
         $("#js-row--content").trigger(":lightbox/renderContent", "Test content here.");
+        jasmine.clock().tick(301);
 
         expect($(".js-lightbox-content").html()).toBe("Test content here.");
+        expect($("#js-lightbox")).toHaveClass("content-ready");
       });
 
-      it("can add a custom class to the lightbox", function() {
-        expect($("#js-lightbox")).toHaveClass("lightbox-foo");
+    });
+
+    describe("Error handling", function() {
+
+      beforeEach(function() {
+        jasmine.clock().install();
+        lightbox = new LightBox({ showPreloader: true });
+        spyOn(lightbox, "_isAboveBreakpoint").and.returnValue(true);
+      });
+
+      afterEach(function() {
+        jasmine.clock().uninstall();
+      });
+
+      it("handles errors appropriately", function() {
+        var $lightbox;
+
+        $("#js-row--content").trigger(":lightbox/open", {opener: "foo"});
+        $("#js-row--content").trigger(":layer/error", [ "404", "not found" ]);
+
+        $lightbox = $("#js-lightbox");
+
+        jasmine.clock().tick(301);
+
+        expect($lightbox.find(".alert--warning").length).toBe(1);
+        expect($lightbox.find(".alert__title").html()).toBe("Sorry, there was an error fetching the rest of this content.");
       });
 
     });
@@ -69,6 +260,12 @@ require([ "jquery", "public/assets/javascripts/lib/components/lightbox.js" ], fu
     describe("Preloader", function() {
       beforeEach(function() {
         lightbox = new LightBox({ showPreloader: true });
+        spyOn(lightbox, "viewport").and.returnValue({
+          width: 600
+        });
+        $("#js-row--content").trigger(":lightbox/open", {
+          opener: lightbox.opener
+        });
       });
 
       it("should append the preloader HTML", function() {
@@ -76,49 +273,19 @@ require([ "jquery", "public/assets/javascripts/lib/components/lightbox.js" ], fu
       });
     });
 
-    describe("Lightbox centering", function() {
+    describe("Custom renderer", function() {
+      var renderer;
 
-      beforeEach(function() {
-        $(".lightbox__content").height(600).width(800);
+      beforeEach(function(done) {
+        renderer = jasmine.createSpy("renderer");
+        lightbox = new LightBox({ customRenderer: renderer });
+        lightbox._renderContent("foo");
+
+        setTimeout(done, 300);
       });
 
-      it("when the viewport has sufficient space", function() {
-        spyOn(lightbox, "viewport").andReturn({
-          left: 0,
-          height: 800,
-          top: 0,
-          width: 1000
-        });
-
-        lightbox._centerLightbox();
-
-        expect(lightbox._centeredLeftPosition()).toBe(100);
-        expect(lightbox._centeredTopPosition()).toBe(100);
-      });
-
-      it("when the viewport isn't tall enough", function() {
-        spyOn(lightbox, "viewport").andReturn({
-          left: 0,
-          height: 400,
-          top: 0,
-          width: 1000
-        });
-
-        lightbox._centerLightbox();
-
-        expect(lightbox._centeredTopPosition()).toBe(0);
-      });
-
-      it("when the viewport isn't wide enough", function() {
-        spyOn(lightbox, "viewport").andReturn({
-          left: 0,
-          height: 800,
-          top: 0,
-          width: 600
-        });
-        lightbox._centerLightbox();
-
-        expect(lightbox._centeredLeftPosition()).toBe(0);
+      it("gets called if defined", function() {
+        expect(renderer).toHaveBeenCalled();
       });
 
     });

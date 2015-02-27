@@ -51,6 +51,7 @@ field_components:
     :placeholder: "Placeholder"
     :cols: 40
     :rows: 4
+    :readonly: true
 
   -
     :styleguide_title: "Date field"
@@ -99,22 +100,12 @@ field_components:
           :key: "value"
           :super: "man"
 
-  -
-    :styleguide_title: "Security Code field"
-    :label: "Field label"
-    :id: "text_id"
-    :name: "text_name"
-    :placeholder: "Placeholder"
-    :data:
-      :key: "value"
-      :super: "man"
-
-
 dropdown_components:
   -
     :styleguide_title: "Dropdown"
     :id: "input_id"
     :name: "text_name"
+    :label: "Select label"
     :options:
       - :title: 'one'
       - :title: 'two'
@@ -125,13 +116,14 @@ dropdown_components:
 
   -
     :styleguide_title: "Select field"
-    :label: "Select legend"
+    :label: "Select label"
     :id: "select_id"
     :fields:
       -
         :name: "select_name"
         :placeholder: "Select Item"
         :selected: "three"
+        :class: "select_class"
         :options:
           - :title: 'one'
           - :title: 'two'
@@ -141,11 +133,12 @@ dropdown_components:
 
   -
     :styleguide_title: "Select field"
-    :label: "Multiple Select legend"
+    :label: "Multiple Select label"
     :id: "multiple_select_id"
     :fields:
       -
         :name: "select_name"
+        :class: "select_class"
         :placeholder: "Item One"
         :options:
           - :title: 'one'
@@ -153,6 +146,7 @@ dropdown_components:
           - :title: 'three'
       -
         :name: "select_name"
+        :class: "select_class"
         :placeholder: "Item Two"
         :options:
           - :title: 'a'
@@ -161,6 +155,7 @@ dropdown_components:
           - :title: 'd'
       -
         :name: "select_name"
+        :class: "select_class"
         :placeholder: "Item Three"
         :options:
           - :title: 'a1'

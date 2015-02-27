@@ -11,24 +11,36 @@ require([ "jquery" ], function($) {
   "use strict";
 
   require([
-    "lib/core/base",
     "flamsteed",
+    "lib/core/ad_manager",
+    "lib/page/swipe",
+    "lib/core/authenticator",
+    "lib/core/shopping_cart",
+    "lib/components/toggle_active",
+    "lib/core/cookie_compliance",
+    "lib/components/select_group_manager",
+    "lib/core/nav_search",
+    "lib/core/feature_detect",
     "trackjs",
     "polyfills/function_bind",
     "polyfills/xdr"
-  ], function(Base, Flamsteed) {
+  ], function(Flamsteed, AdManager) {
 
-    $(function() {
+    $(document).ready(function() {
 
       var secure = window.location.protocol === "https:";
 
-      new Base({ secure: secure });
+      if (window.lp.ads) {
+        new AdManager(window.lp.ads).init();
+      }
 
       if (!secure) {
-        window.lp.fs = new Flamsteed({
-          events: window.lp.fs.buffer,
-          u: $.cookies.get("lpUid")
-        });
+        if (window.lp.getCookie) {
+          window.lp.fs = new Flamsteed({
+            events: window.lp.fs.buffer,
+            u: window.lp.getCookie("lpUid")
+          });
+        }
       }
 
     });

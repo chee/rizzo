@@ -1,19 +1,13 @@
-require([ "jquery", "public/assets/javascripts/lib/components/datepicker.js" ], function($, Datepicker) {
+define([ "jquery", "public/assets/javascripts/lib/components/datepicker.js" ], function($, Datepicker) {
 
   "use strict";
 
   describe("Datepicker", function() {
 
-
     describe("Initialisation", function() {
 
       beforeEach(function() {
         loadFixtures("datepicker.html");
-      });
-
-      it("is defined", function() {
-        var datepicker = new Datepicker({});
-        expect(datepicker).toBeDefined();
       });
 
       it("sets up the datepicker with default class names", function() {
@@ -60,46 +54,8 @@ require([ "jquery", "public/assets/javascripts/lib/components/datepicker.js" ], 
         expect(config.callbacks.onDateSelect).toHaveBeenCalled();
       });
 
-      it("selecting an 'end' date before the selected 'start' date updates the 'start' date to the day before", function() {
-        var expected, selected;
-
-        new Datepicker({ target: ".js-standard" });
-
-        $("#js-av-start").trigger("focus");
-        $(".js-start-container .picker__day--infocus:not(.picker__day--disabled)").eq(5).trigger("click");
-
-        $("#js-av-end").trigger("focus");
-        $(".js-end-container .picker__day--infocus:not(.picker__day--disabled)").eq(4).trigger("click");
-
-        $("#js-av-start").trigger("focus");
-        selected = $(".js-start-container .picker__day--selected");
-        // .eq(4) because `today` isn't an option in the `#js-av-end` field.
-        expected = $(".js-start-container .picker__day--infocus:not(.picker__day--disabled)").eq(4);
-
-        expect(selected.html()).toBe(expected.html());
-      });
-
-      it("selecting a 'start' date after the selected 'end' date updates the 'end' date to the day after", function() {
-        var expected, selected;
-
-        new Datepicker({ target: ".js-standard" });
-
-        $("#js-av-end").trigger("focus");
-        $(".js-end-container .picker__day--infocus:not(.picker__day--disabled)").eq(4).trigger("click");
-
-        $("#js-av-start").trigger("focus");
-        $(".js-start-container .picker__day--infocus:not(.picker__day--disabled)").eq(5).trigger("click");
-
-        $("#js-av-end").trigger("focus");
-        selected = $(".js-end-container .picker__day--selected");
-        // .eq(5) because `today` isn't an option in the `#js-av-end` field.
-        expected = $(".js-end-container .picker__day--infocus:not(.picker__day--disabled)").eq(5);
-
-        expect(selected.html()).toBe(expected.html());
-      });
-
       it("can limit searching to only be in the past", function() {
-        var sibling;
+        var cell, sibling;
 
         new Datepicker({
           backwards: true,
@@ -107,9 +63,58 @@ require([ "jquery", "public/assets/javascripts/lib/components/datepicker.js" ], 
         });
 
         $("#js-av-start").trigger("focus");
-        sibling = $(".picker--opened .picker__day--today").closest("td").next().find(".picker__day");
 
-        expect(sibling).toHaveClass("picker__day--disabled");
+        cell = $(".picker--opened .picker__day--today").closest("td");
+
+        if (cell.next().length) {
+          sibling = cell.next();
+        } else {
+          sibling = cell.parent().next().children().first();
+        }
+
+        expect(sibling.find(".picker__day")).toHaveClass("picker__day--disabled");
+      });
+
+      describe("Choosing dates", function(){
+
+        var expected, selected, stubDate;
+
+        beforeEach(function(){
+          stubDate = new Date();
+          stubDate.setMonth(stubDate.getMonth() + 1);
+          stubDate.setDate("20");
+
+          new Datepicker({ target: ".js-standard" });
+          $("#js-av-start").data("pickadate").set("select", stubDate);
+        });
+
+        it("selecting an 'end' date before the selected 'start' date updates the 'start' date to the day before", function() {
+
+          $("#js-av-start").trigger("focus");
+          $(".js-start-container .picker__day--infocus:not(.picker__day--disabled):contains('23')").trigger("click");
+
+          $("#js-av-end").trigger("focus");
+          $(".js-end-container .picker__day--infocus:not(.picker__day--disabled):contains('22')").trigger("click");
+
+          $("#js-av-start").trigger("focus");
+          selected = $(".js-start-container .picker__day--selected");
+
+          expect(selected.text()).toBe("21");
+        });
+
+        it("selecting a 'start' date after the selected 'end' date updates the 'end' date to the day after", function() {
+
+          $("#js-av-end").trigger("focus");
+          $(".js-end-container .picker__day--infocus:not(.picker__day--disabled):contains('23')").trigger("click");
+
+          $("#js-av-start").trigger("focus");
+          $(".js-start-container .picker__day--infocus:not(.picker__day--disabled):contains('24')").trigger("click");
+
+          $("#js-av-end").trigger("focus");
+          selected = $(".js-end-container .picker__day--selected");
+
+          expect(selected.text()).toBe("25");
+        });
       });
 
     });

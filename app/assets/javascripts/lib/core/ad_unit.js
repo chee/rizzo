@@ -1,4 +1,4 @@
-define([ "jquery", "lib/core/ads/double_mpu" ], function($, DoubleMPU) {
+define(function() {
 
   "use strict";
 
@@ -10,10 +10,12 @@ define([ "jquery", "lib/core/ads/double_mpu" ], function($, DoubleMPU) {
 
   AdUnit.prototype._init = function() {
     if (this.isEmpty()) {
+      this.$target.trigger(":ads/hidden");
       return;
     }
 
     this.$target.closest(".is-closed").removeClass("is-closed");
+    this.$target.trigger(":ads/visible");
 
     var extension = this.$target.data("extension");
 
@@ -34,14 +36,29 @@ define([ "jquery", "lib/core/ads/double_mpu" ], function($, DoubleMPU) {
 
   AdUnit.prototype.getType = function() {
     var patterns = /(leaderboard|mpu|trafficDriver|adSense|sponsorTile)/,
-        matches = this.$target.attr("id").match(patterns);
+        matches = this.$target.attr("class").match(patterns);
 
     return matches ? matches[1] : null;
   };
 
-  AdUnit.prototype.refresh = function() {
+  AdUnit.prototype.refresh = function(newConfig) {
     var slot = this.$target.data("googleAdUnit");
+    if (newConfig) {
+      this.clearConfig(slot);
+      this.setNewConfig(slot, newConfig);
+    }
+
     window.googletag.pubads().refresh([ slot ]);
+  };
+
+  AdUnit.prototype.setNewConfig = function(slot, newConfig) {
+    for (var param in newConfig) {
+      slot.setTargeting(param, newConfig[param]);
+    }
+  };
+
+  AdUnit.prototype.clearConfig = function(slot) {
+    slot.clearTargeting();
   };
 
   AdUnit.prototype.extensions = {
@@ -49,9 +66,8 @@ define([ "jquery", "lib/core/ads/double_mpu" ], function($, DoubleMPU) {
     stackMPU: function() {
       var $container = this.$target.closest(".js-card-sponsored");
 
-      if (this.$iframe.height() > $container.height()) {
+      if (this.$iframe.height() > $container.outerHeight()) {
         $container.addClass("card--sponsored--double-mpu");
-        this.extension = new DoubleMPU(this.$target, $container);
       }
     }
 

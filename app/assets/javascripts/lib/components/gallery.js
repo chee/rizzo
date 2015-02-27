@@ -1,10 +1,8 @@
 define([
   "jquery",
-  "lib/utils/debounce",
   "lib/components/slider",
   "lib/analytics/analytics",
-  "lib/utils/on_transition_end"
-], function($, debounce, Slider, Analytics, onTransitionEnd) {
+], function($, Slider, Analytics) {
 
   "use strict";
 
@@ -29,9 +27,14 @@ define([
       el: this.$gallery,
       $listener: this.$listener,
       assetBalance: 4,
+      assetReveal: true,
       createControls: false,
-      keyboardControl: true
+      keyboardControls: true,
+      loopAround: true
     }, this.config.sliderConfig));
+
+    if (!(this.slider && this.slider.$currentSlide)) return;
+
     this._gatherElements();
     this._handleEvents();
   };
@@ -40,36 +43,49 @@ define([
     this.galleryTitle = this.$gallery.find(".js-gallery-title");
     this.galleryPoi = this.$gallery.find(".js-gallery-poi");
     this.galleryBreadcrumb = this.$gallery.find(".js-gallery-breadcrumb");
+    this.gallerySocial = this.$gallery.find(".js-gallery-social");
   };
 
   Gallery.prototype._updateImageInfo = function() {
     var slideDetails = this.slider.$currentSlide.find(".js-slide-details"),
-        caption = slideDetails.find(".caption").text(),
-        poi = slideDetails.find(".poi").html(),
-        breadcrumb = slideDetails.find(".breadcrumb").html();
+        caption = slideDetails.find(".js-slide-caption").text(),
+        poi = slideDetails.find(".js-slide-poi").html(),
+        breadcrumb = slideDetails.find(".js-slide-breadcrumb").html(),
+        social = slideDetails.find(".js-slide-social").html();
 
     this.galleryTitle.text(caption);
     this.galleryPoi.html(poi);
     this.galleryBreadcrumb.html(breadcrumb);
+    this.gallerySocial.html(social);
   };
 
-  Gallery.prototype._updateSlug = function() {
-    var partial = this.slider.$currentSlide.data("partial-slug");
+  Gallery.prototype._updateSlug = function(partial) {
     window.history.pushState && window.history.pushState({}, "", this.slug + "/" + partial);
   };
 
-  Gallery.prototype._handleEvents = function() {
-    var afterTransition = debounce(function() {
-      this.analytics.track();
-      this._updateImageInfo();
-      this._updateSlug();
-      this.$listener.trigger(":ads/refresh");
-    }.bind(this), 200);
+  /* jshint ignore:start */
+  Gallery.prototype._updateGoogleAnalytics = function(partial, ga) {
+    if (ga.dataLayer.summaryTag && ga.dataLayer.summaryTag.content_id) {
+      ga.dataLayer.summaryTag.content_id = partial;
+      ga.api.trackPageView(ga.dataLayer);
+    }
+  };
+  /* jshint ignore:end */
 
-    onTransitionEnd({
-      $listener: this.slider.$slides,
-      fn: afterTransition
-    });
+  Gallery.prototype._afterNavigation = function() {
+    var partial = this.slider.$currentSlide.data("partial-slug");
+    this.analytics.track();
+    this._updateImageInfo();
+    this._updateSlug(partial);
+    this._updateGoogleAnalytics(partial, window.lp.analytics);
+    this.$listener.trigger(":ads/refresh");
+  };
+
+  Gallery.prototype._handleEvents = function() {
+
+    this.$listener.on(":slider/slideChanged", function() {
+      window.setTimeout(this._afterNavigation.bind(this), this.slider.config.transition * 1.5);
+    }.bind(this));
 
     this.$gallery.on("click", ".is-previous", function() {
       this.slider._previousSlide();

@@ -1,37 +1,68 @@
-require([ "jquery" ], function($) {
+define([
+  "jquery",
+  "flamsteed",
+  "lib/core/ad_manager",
+
+  "sCode",
+  "trackjs",
+  "polyfills/xdr",
+  "lib/page/swipe",
+  "lib/core/nav_search",
+  "lib/page/scroll_perf",
+  "lib/core/authenticator",
+  "lib/core/shopping_cart",
+  "lib/core/feature_detect",
+  "lib/core/place_title_nav",
+  "polyfills/function_bind",
+  "lib/core/cookie_compliance",
+  "lib/components/toggle_active",
+  "lib/components/select_group_manager"
+
+], function($, Flamsteed, AdManager) {
 
   "use strict";
 
-  require([
-    "lib/core/base",
-    "lib/utils/scroll_perf",
-    "flamsteed",
-    "trackjs",
-    "polyfills/function_bind",
-    "polyfills/xdr"
-  ], function(Base, ScrollPerf, Flamsteed) {
+  $(document).ready(function() {
 
-    $(function() {
+    if (window.lp.ads) {
+      new AdManager(window.lp.ads).init();
+    }
 
-      var secure = window.location.protocol === "https:";
+    if (window.location.protocol !== "https:") {
+      // FS can't be served over https https://trello.com/c/2RCd59vk
+      window.lp.fs = new Flamsteed({
+        events: window.lp.fs.buffer,
+        u: window.lp.getCookie("lpUid"),
+        schema: "0.2"
+      });
 
-      new Base({ secure: secure });
-      new ScrollPerf;
+      // Sailthru requests insecure content
+      require([ "sailthru" ], function() {
+        window.Sailthru.setup({ domain: "horizon.lonelyplanet.com" });
+      });
+    }
 
-      // Currently we can"t serve Flamsteed over https because of f.staticlp.com
-      // https://trello.com/c/2RCd59vk/201-move-f-staticlp-com-off-cloudfront-and-on-to-fastly-so-we-can-serve-over-https
-      if (!secure) {
-        window.lp.fs = new Flamsteed({
-          events: window.lp.fs.buffer,
-          u: $.cookies.get("lpUid")
-        });
+    // Navigation tracking
+    $("#js-primary-nav").on("click", ".js-nav-item", function() {
+      window.s.linkstacker($(this).text());
+    });
 
-        require([ "sailthru" ], function() {
-          window.Sailthru.setup({ domain: "horizon.lonelyplanet.com" });
-        });
-      }
+    $("#js-primary-nav").on("click", ".js-nav-cart", function() {
+      window.s.linkstacker("shopping-cart");
+    });
 
+    $("#js-secondary-nav").on("click", ".js-nav-item", function() {
+      window.s.linkstacker($(this).text() + "-sub");
+    });
+
+    $("#js-breadcrumbs").on("click", ".js-nav-item", function() {
+      window.s.linkstacker("breadcrumbs");
+    });
+
+    $("#js-footer-nav").on("click", ".js-nav-item", function() {
+      window.s.linkstacker("footer");
     });
 
   });
+
 });

@@ -3,10 +3,14 @@
 // ----------------------------------------------------------------------------
 
 .row--sponsored
-  @extend %transition--slower
-  min-height: 98px
-  padding: 16px 0
+  transition: height 0.5s ease
+  min-height: 60px
   overflow: hidden
+  &.row--leaderboard
+    transition: height 0.5s ease, transform 0.4s ease
+
+  +respond-to(728)
+    min-height: 100px
 
   &.is-closed
     min-height: 0
@@ -17,32 +21,43 @@
 // Site leaderboard
 // ----------------------------------------------------------------------------
 
-.row--leaderboard
-  +z-layer(modal)
-  background-color: $row-leaderboard
-  position: relative
-
 .ad-leaderboard
-  text-align: center
+  padding: 12px 0
+  +respond-to(728)
+    padding: 16px 0
 
 .ad-leaderboard__inner
-  @extend %inline-block
   position: relative
-  display: inline-block
-  border: 3px solid $header-blue
-  vertical-align: bottom
-  border-radius: 2px
-  background-color: $row-primary--darker
+  display: table
+  margin-left: auto
+  margin-right: auto
+  +respond-to(728 + 180)
+    padding-left: 90px
+    padding-right: 90px
 
-  &:after
-    @extend %empty-abs-generated-content
-    top: 50%
-    right: -15px
-    width: 10px
-    height: 96px
-    margin-top: -48px
-    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAABZCAMAAADbwf7VAAAAY1BMVEUVOnkrUY0eQXstVZATNnEZPHYWOXMRNG4oTokwWJQbPnkzW5cSNW8JLmkhRoAlSoUlR4ENMWsPMm0xV5EpTYcTN28zWpQXOnIWRocROHc4YJsAJWUANHcLP4IZQIAAKm8SNm4BAkT6AAAB20lEQVR4Xj2S53rkMAhFDaj24jolyb7/Uy5o4vDNjzOAzJUuy3IqjnQuk5JSQnu6c5sRFDrMsNbuTCvqEAK+OeeJ4/jinFYc+ofJjGTtydSMxMxFH71/XsvCJw3645unjV68k75dk8fO9GjRGWXmtEje++i4z3DKaM6BGSXk7RItlkre3JwGN1khqXqKnmRaQAwY2puJEVHoeBIAiOYG5ILdH6zABkewcfVUPRt4cnVPyLnG1Ubcl/blc5bo4GlaB/4hVzc1is7t60/V9acFmFQHfDXiKkEkJ6qac7VWkJvblHXFl9wcQyR5l6N0cK/NL9+rTYR9ntUhmgzX8thidAkO8UiHYYu8biulliLqHd1+NGVTSufP7ZvQiiJ6+sZ+RP904pvhOMPsS2n2oTbWKnyLqlidl9c4qvEUppc6u9pPIfWqJe8PqRaiqWADcA5WpmBHsl0z3c5MopsG4KQDNVUDkovxV1XTSZm5B6t3mPrOdKLz/Ec8st2Gj0fDoKOjiJdS3AOfYE9zPsVV7YjqZ6+gVr8yrTWPbufGyow+tag+Rm4wPeKITM1x1I2//K/n3PV6MVldfZS7sRTwNc89xeyq6Ju5kmUu95EH2XFlR8LVMaWkkpW+pGYs/wHCZCJNIACgZQAAAABJRU5ErkJggg==)
-    background-repeat: no-repeat
+.sponsor-logo
+  margin-top: 10px
+  +respond-to(728 + 180)
+    position: absolute
+    top: 0
+    left: 0
+    margin-top: 0
+
+.sponsor-logo__logo
+  display: inline
+  max-width: 80px
+  max-height: 40px
+  margin-right: 5px
+  vertical-align: middle
+  +respond-to(728 + 180)
+    display: block
+    margin: 0 0 5px
+
+.row--leaderboard--header
+  background-color: $row-leaderboard
+
+.row--leaderboard--footer
+  background: darken($body-background, 2.5%)
 
 // ----------------------------------------------------------------------------
 // Page billboard
@@ -52,11 +67,22 @@
   background: darken($body-background, 2.5%)
 
 .ad-billboard
+  padding: 12px 0
   text-align: center
+  +respond-to(728)
+    padding: 20px 0
 
 .ad-billboard__inner
   display: inline-block
   vertical-align: bottom
+
+// ----------------------------------------------------------------------------
+// MPU
+// ----------------------------------------------------------------------------
+
+.adunit--mpu
+  background: $subduedgray
+  min-height: 250px
 
 // ----------------------------------------------------------------------------
 // Sponsor tile
@@ -71,14 +97,6 @@
   &.is-closed
     opacity: 0
 
-  .stack__intro &
-    position: absolute
-    right: 25px
-    margin-top: 8px
-
-  + .copy--h1
-    width: 450px
-
 .ad-sponsorTile__tag
   margin-bottom: 2px
   text-align: right
@@ -87,96 +105,38 @@
 // Ad sense
 // ----------------------------------------------------------------------------
 
-.ad-adSense
-  font-size: 12px
-  line-height: 15px
-
-  p,
-  .title a,
-  .googleHeading a
-    color: $body-copy
-
-  a
-    word-wrap: break-word
-
-  .ad
-    margin-bottom: 10px
-    p
-      margin-bottom: 0
-
-  .title
-    font-weight: bold
+.ad-adSense--leaderboard
+  margin-top: 20px
 
 // ----------------------------------------------------------------------------
-// Page wallpaper
+// HTML Traffic Driver
 // ----------------------------------------------------------------------------
 
-.ad-oneByOne
-  display: none
+.traffic-driver
+  overflow: hidden
 
-.ad-wallpaper
+.traffic-driver__link:hover
+  text-decoration: none
+
+.traffic-driver__content
   position: relative
-  background-repeat: no-repeat
-  background-position: center top
-  cursor: pointer
+  height: 50px
+  padding: 10px
 
-  &:after
-    +z-layer
-    @extend %empty-abs-generated-content
-    top: 1150px
-    height: 150px
-    width: 100%
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), $body-background)
+.traffic-driver__title
+  text-transform: uppercase
+  font-weight: bold
+  color: $titlegray
 
-  .row__inner--content,
-  .row__inner--secondary
-    +z-layer(middle)
-    padding-right: 22px
-    padding-left: 22px
-    background-color: $body-background
-
-// ----------------------------------------------------------------------------
-// Interstitial
-// ----------------------------------------------------------------------------
-
-.ad-interstitial-wrap
-  +z-layer(top)
-  position: fixed
-  top: 0
-  right: 0
-  left: 0
-  bottom: 0
-  display: block
-  background: #333
-  background: rgba(0, 0, 0, .8)
-  transition: opacity .5s ease
-  zoom: 1
-
-.ad-interstitial
-  +z-layer(modal)
+.traffic-driver__logo,
+.traffic-driver__badge
   position: absolute
-  display: none // Gets shown later via JS when there's content.
-  margin: 0 auto
-  padding: 25px 10px
-  border: 1px solid $subduedgray
-  background: white
-  box-shadow: 5px 5px 5px rgba(0, 0, 0, .5)
+  bottom: 10px
 
-  iframe
-    border: none
-
-  .close
-    position: absolute
-    right: 10px
-    top: 5px
-
-  .countdown
-    position: absolute
-    left: 0
-    bottom: 5px
-    display: block
-    text-align: center
-    width: 100%
+.traffic-driver__logo
+  right: 10px
+  max-width: 60px
+  max-height: 20px
 
 // ----------------------------------------------------------------------------
 // Paraphernalia

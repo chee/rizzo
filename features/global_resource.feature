@@ -3,21 +3,13 @@ Feature: Global Resources
   As the lp global service
   I should be able to serve the global-head, body-header and global-footer snippets
 
-  Scenario: it serves the core header and footer
-    Given I go to "/global"
-    Then the Core layout should be displayed
+  Scenario: it serves the style guide
+    Given I go to "/styleguide"
+    Then I should not see a 500
 
   Scenario: it serves the legacy header and footer
-    Given I go to "/legacy"
+    Given I go to "/layouts/legacy"
     Then the Legacy layout should be displayed
-
-  Scenario: it serves the responsive header and footer
-    Given I go to "/responsive"
-    Then the Responsive layout should be displayed
-
-  Scenario: it serves the homepage header and footer
-    Given I go to "/homepage"
-    Then the Homepage layout should be displayed
 
   Scenario: it serves the global-head
     Given I go to "/global-head"
@@ -25,11 +17,11 @@ Feature: Global Resources
     And the non-secure global-head content should be displayed
     And the tynt tag should be displayed
 
-  Scenario: it serves the global-head-thorntree
-    Given I go to "/global-head-thorntree"
-    Then the base global-head content should be displayed
+  Scenario: it serves the responsive global-head
+    Given I go to "/global-head/responsive"
+    Then the responsive global-head content should be displayed
     And the non-secure global-head content should be displayed
-    And the tynt tag should not be displayed
+    And the tynt tag should be displayed
 
   Scenario: it serves the secure global head
     Given I go to "/secure/global-head"

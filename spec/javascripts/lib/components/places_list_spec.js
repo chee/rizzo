@@ -1,4 +1,4 @@
-require([ "jquery", "public/assets/javascripts/lib/components/place_list" ], function($, PlaceList) {
+define([ "jquery", "public/assets/javascripts/lib/components/place_list" ], function($, PlaceList) {
 
   "use strict";
 
@@ -9,12 +9,6 @@ require([ "jquery", "public/assets/javascripts/lib/components/place_list" ], fun
         list: ".js-descendant-item, .js-nearby-place-item"
       },
       LISTENER = "#js-card-holder";
-
-    describe( "Object", function() {
-      it("is defined", function() {
-        expect( PlaceList ).toBeDefined();
-      });
-    });
 
     describe( "Initialising", function() {
       beforeEach(function() {
@@ -32,7 +26,7 @@ require([ "jquery", "public/assets/javascripts/lib/components/place_list" ], fun
       beforeEach(function() {
         loadFixtures( "places_list.html" );
         placesList = new PlaceList( config );
-        spyOn(placesList, "getParams").andReturn( "foo=bar" );
+        spyOn(placesList, "getParams").and.returnValue( "foo=bar" );
         placesList._update();
       });
 

@@ -1,15 +1,24 @@
-window.lp = {};
-window.lp.supports = {};
-window.lp.isMobile = false;
-window.lpUserStatusCallback = function() {};
+window.lp = {
+  supports: {
+    transform: {
+      css: ""
+    },
+    localStorage: true
+  },
+  analytics: {
+    api: {
+      trackEvent: function() {}
+    }
+  },
+  isMobile: false,
+  getCookie: function() {},
+};
 
 require.config({
   paths: {
-    jquery: "vendor/assets/javascripts/jquery/jquery",
-    lib: "public/assets/javascripts/lib",
-    jplugs: "vendor/assets/javascripts/jquery-plugins",
-    touchwipe: "vendor/assets/javascripts/jquery.touchwipe.1.1.1",
-    s_code: "vendor/assets/javascripts/omniture/s_code",
-    nouislider: "vendor/assets/javascripts/nouislider"
+    picker: "vendor/assets/javascripts/pickadate/lib/picker",
+    pickerDate: "vendor/assets/javascripts/pickadate/lib/picker.date",
+    pickerLegacy: "vendor/assets/javascripts/pickadate/lib/legacy",
+    "jquery-bbq-deparam/jquery-deparam": "vendor/assets/javascripts/jquery-bbq-deparam/jquery-deparam"
   }
 });

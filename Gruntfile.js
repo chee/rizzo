@@ -33,6 +33,11 @@ module.exports = function(grunt) {
           cssprefix: ".icon--",
           customselectors: {
             "*": [ ".icon--$1--before:before, .icon--$1--after:after" ],
+            // leave single words unquoted for jscs to pass
+            calendar: [ "#quote-departure-date .icon, #quote-return-date .icon" ],
+            magazine: [ ".icon--guide, .icon--guide--before:before, .icon--guide--after:after" ],
+            population: [ ".icon--population-ntk" ],
+            "place--pin": [ ".icon--place, .icon--place--before:before, .icon--place--after:after" ],
             "chevron-right": [ ".picker__nav--next" ],
             "chevron-left": [ ".picker__nav--prev" ],
             "chevron-down": [ ".select2-choice:after" ],
@@ -65,9 +70,11 @@ module.exports = function(grunt) {
     },
     svgmin: {
       options: {
-        plugins: [ {
-          removeViewBox: false
-        } ]
+        plugins: [
+          { removeDesc: true },
+          { removeTitle: true },
+          { removeViewBox: false }
+        ]
       },
       dist: {
         files: [ {
@@ -97,6 +104,9 @@ module.exports = function(grunt) {
       },
       fetchSubmodules: {
         command: "git submodule init && git submodule update"
+      },
+      killPhantom: {
+        command: "pkill -f phantomjs || true"
       }
     },
     coffee: {
@@ -120,6 +130,12 @@ module.exports = function(grunt) {
       }
     },
     copy: {
+      data: {
+        expand: true,
+        cwd: "./app/assets/javascripts/data",
+        src: [ "**/*.js", "**/**/*.js" ],
+        dest: "./public/assets/javascripts/data"
+      },
       source: {
         expand: true,
         cwd: "./app/assets/javascripts/lib",
@@ -148,25 +164,33 @@ module.exports = function(grunt) {
     },
     jasmine: {
       rizzo: {
-        src: [ "./public/assets/javascripts/lib/**/*.js", "!./public/assets/javascripts/lib/styleguide/*.js" ],
         options: {
-          helpers: [ "./spec/javascripts/helpers/**/*.js", "./vendor/assets/javascripts/jquery/jquery.js" ],
           host: "http://127.0.0.1:8888/",
-          specs: "./public/assets/javascripts/spec/**/*.js",
+          helpers: "./spec/javascripts/helpers/**/*.js",
           template: require("grunt-template-jasmine-requirejs"),
+          specs: "./public/assets/javascripts/spec/**/*_spec.js",
+          vendor: "./vendor/assets/javascripts/jquery/dist/jquery.js",
           templateOptions: {
+            version: "./vendor/assets/javascripts/requirejs/require.js",
             requireConfig: {
               baseUrl: "./",
               paths: {
-                jquery: "./vendor/assets/javascripts/jquery/jquery",
-                jsmin: "./vendor/assets/javascripts/lonelyplanet_minjs/dist/$",
-                polyfills: "./vendor/assets/javascripts/polyfills",
-                lib: "./public/assets/javascripts/lib",
+                flamsteed: "./vendor/assets/javascripts/flamsteed/lib/javascripts/flamsteed",
+                hogan: "./vendor/assets/javascripts/hogan/dist/hogan-3.0.0.amd",
                 jplugs: "./vendor/assets/javascripts/jquery-plugins",
+                jquery: "./vendor/assets/javascripts/jquery/dist/jquery",
+                jtimeago: "./vendor/assets/javascripts/jquery-timeago/jquery.timeago",
+                sailthru: "./vendor/assets/javascripts/sailthru/v1",
                 sCode: "./vendor/assets/javascripts/omniture/s_code",
-                gpt: "http://www.googletagservices.com/tag/js/gpt",
+                trackjs: "./vendor/assets/javascripts/trackjs/trackjs",
+                dfp: "./vendor/assets/javascripts/jquery.dfp.js/jquery.dfp",
+                autocomplete: "./vendor/assets/javascripts/autocomplete/dist/autocomplete",
+                nouislider: "./vendor/assets/javascripts/nouislider",
                 pickadate: "./vendor/assets/javascripts/pickadate",
-                dfp: "./vendor/assets/javascripts/jquery.dfp.js/jquery.dfp"
+                polyfills: "./vendor/assets/javascripts/polyfills",
+                usabilla: "./vendor/assets/javascripts/usabilla",
+                data: "./public/assets/javascripts/data",
+                lib: "./public/assets/javascripts/lib"
               }
             }
           }
@@ -175,7 +199,11 @@ module.exports = function(grunt) {
     },
     watch: {
       scripts: {
-        files: [ "app/assets/javascripts/lib/**/*.coffee", "spec/javascripts/lib/**/*.coffee" ],
+        files: [
+          "app/assets/javascripts/data/**/*.coffee",
+          "app/assets/javascripts/lib/**/*.coffee",
+          "spec/javascripts/lib/**/*.coffee"
+        ],
         tasks: [ "shell:cleanJs", "newer:coffee", "jasmine" ],
         options: {
           nospawn: true
@@ -185,7 +213,7 @@ module.exports = function(grunt) {
     plato: {
       rizzo: {
         files: {
-          ".plato/": [ "./public/assets/javascripts/**/*.js" ]
+          ".plato/": [ "./public/assets/javascripts/lib/**/*.js" ]
         }
       }
     },
@@ -205,12 +233,12 @@ module.exports = function(grunt) {
   });
 
   // This loads in all the grunt tasks auto-magically.
-  require("matchdep").filterDev("grunt-*").forEach(grunt.loadNpmTasks);
+  require("matchdep").filterDev("grunt-!(template-jasmine-requirejs)").forEach(grunt.loadNpmTasks);
 
   // Tasks
-  grunt.registerTask("default", [ "shell:cleanJs", "coffee", "copy", "connect", "jasmine" ]);
+  grunt.registerTask("default", [ "shell:cleanJs", "coffee", "copy", "connect", "jasmine", "shell:killPhantom" ]);
   grunt.registerTask("ci", [ "coffee", "copy", "connect", "jasmine" ]);
-  grunt.registerTask("dev", [ "connect", "open:jasmine", "jasmine", "watch" ]);
+  grunt.registerTask("dev", [ "connect", "open:jasmine", "jasmine", "watch", "shell:killPhantom" ]);
   grunt.registerTask("wip", [ "jasmine:rizzo:build", "open:jasmine", "connect:server:keepalive" ]);
   grunt.registerTask("report", [ "shell:cleanJs", "coffee", "copy", "plato", "shell:openPlato" ]);
   grunt.registerTask("imageoptim", [ "imageoptim" ]);

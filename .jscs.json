@@ -1,6 +1,5 @@
 {
   "requireCurlyBraces": [
-    "if",
     "else",
     "for",
     "while",
@@ -46,61 +45,6 @@
 
   "requireCommaBeforeLineBreak": true,
 
-  "requireOperatorBeforeLineBreak": [
-    "?",
-    "+",
-    "-",
-    "/",
-    "*",
-    "=",
-    "==",
-    "===",
-    "!=",
-    "!==",
-    ">",
-    ">=",
-    "<",
-    "<="
-  ],
-
-  "disallowLeftStickedOperators": [
-    "?",
-    "+",
-    "-",
-    "/",
-    "*",
-    "=",
-    "==",
-    "===",
-    "!=",
-    "!==",
-    ">",
-    ">=",
-    "<",
-    "<="
-  ],
-
-  "requireRightStickedOperators": [
-    "!"
-  ],
-
-  "disallowRightStickedOperators": [
-    "?",
-    "+",
-    "/",
-    ":",
-    "*",
-    "=",
-    "==",
-    "===",
-    "!=",
-    "!==",
-    ">",
-    ">=",
-    "<",
-    "<="
-  ],
-
   "disallowSpaceAfterPrefixUnaryOperators": [
     "++",
     "--",
@@ -108,10 +52,6 @@
     "-",
     "~",
     "!"
-  ],
-
-  "requireLeftStickedOperators": [
-    ","
   ],
 
   "disallowSpaceBeforePostfixUnaryOperators": [
@@ -127,8 +67,36 @@
     "=",
     "==",
     "===",
+    "%",
     "!=",
-    "!=="
+    "!==",
+    "+=",
+    "-=",
+    "/=",
+    "*=",
+    "%=",
+    "&=",
+    "^=",
+    "|=",
+    "==",
+    "===",
+    "!=",
+    "!==",
+    "&&",
+    "&",
+    "^",
+    "|",
+    "||",
+    ">",
+    "<",
+    "<<",
+    ">>",
+    ">>>",
+    "<=",
+    ">=",
+    "<<=",
+    ">>=",
+    ">>>="
   ],
 
   "requireSpaceAfterBinaryOperators": [
@@ -139,8 +107,36 @@
     "=",
     "==",
     "===",
+    "%",
     "!=",
-    "!=="
+    "!==",
+    "+=",
+    "-=",
+    "/=",
+    "*=",
+    "%=",
+    "&=",
+    "^=",
+    "|=",
+    "==",
+    "===",
+    "!=",
+    "!==",
+    "&&",
+    "&",
+    "^",
+    "|",
+    "||",
+    ">",
+    "<",
+    "<<",
+    ">>",
+    ">>>",
+    "<=",
+    ">=",
+    "<<=",
+    ">>=",
+    ">>>="
   ],
 
   "disallowMultipleLineStrings": true,
@@ -157,6 +153,9 @@
 
   "disallowTrailingWhitespace": true,
 
+  "disallowKeywords": [
+  ],
+
   "disallowKeywordsOnNewLine": [
     "else",
     "catch"
@@ -168,9 +167,12 @@
 
   "requireDotNotation": true,
 
+  "disallowYodaConditions": true,
+
   "excludeFiles": [
     "node_modules/**",
     "public",
-    "vendor"
+    "vendor",
+    "app/assets/javascripts/lib/components/usabilla.js"
   ]
 }

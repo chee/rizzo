@@ -1,66 +1,37 @@
 $ad-width: 300px
 $footer-height: 250px
-$nav-height: 187px
-$slide-width-phone-small: 320px
-$slide-width-phone: 480px
-$slide-width-tablet: 768px
-$slide-width: 1000px
-
-@mixin slide-width($offset: 0)
-  width: $slide-width + $offset
-  .responsive &
-    width: $slide-width-phone-small
-    +respond-to(480)
-      width: $slide-width-phone + $offset
-    +respond-to(768)
-      width: $slide-width-tablet + $offset
-    +respond-to(larger-than-ipad)
-      width: $slide-width + $offset
-
-@mixin slide-height()
-  height: ($slide-width / 3) * 2
-  .responsive &
-    height: ($slide-width-phone-small / 3) * 2
-    +respond-to(480)
-      height: ($slide-width-phone / 3) * 2
-    +respond-to(768)
-      height: ($slide-width-tablet / 16) * 9
-    +respond-to(larger-than-ipad)
-      height: ($slide-width / 3) * 2
 
 .gallery
   margin: auto
   transition: left .5s ease
 
 .gallery__controls
-  +slide-height()
+  top: 0
   left: 0
-  position: absolute
-  width: 100%
+  margin: 0 auto
+  width: 80%
   .gallery-box &
     top: 120px
 
-.gallery__slide-background
-  +slide-height()
-  background: $body-copy
-  left: 0
-  position: absolute
-  width: 100%
-  .gallery-box &
-    top: 120px
+.gallery__viewport
+  background-color: $titlegray
 
-.gallery__slide-container
-  +slide-height()
-  +slide-width()
+.gallery__container
   position: relative
   margin: auto
-  transition: margin-left 0.2s ease-in-out
+  +respond-to(wide-view)
+    width: 80%
+    .slider--4x3 &
+      padding-top: percentage((1 / 4) * 3 * .8)
+    .slider--16x9 &
+      padding-top: percentage((1 / 16) * 9 * .8)
 
 .gallery__slide
-  +slide-height()
-  +slide-width()
-  &:nth-child(even)
-    background-color: #3E4752
+  opacity: 0.5
+  &.is-current
+    opacity: 1
+    &:hover .social__item--pinned
+      opacity: 1
   &.is-loading.is-current:after
     content: " "
     position: absolute
@@ -73,71 +44,77 @@ $slide-width: 1000px
     border-radius: 100%
     animation: discmove 2s cubic-bezier(0.6, 1, 1, 1) infinite
 
-.gallery__img
-  display: block
-  min-height: 100%
+.gallery__slide__caption
+  +alpha-background($dark-blue-gray, 0.75)
+  bottom: 0
+  box-sizing: border-box
+  color: white
+  font-weight: bold
+  left: 0
+  opacity: 0
+  padding: 14px 21px
+  position: absolute
+  transition: opacity .5s ease
   width: 100%
+  .is-current &
+    opacity: 1
+
+.gallery__slide__caption--position
+  color: $placeholder-copy
+  margin: 0 3px
+  font-weight: normal
+
+.gallery__slide__caption--title
+  margin: 0 3px
+
+.gallery__img
+  &, & > img
+    display: block
+    min-height: 100%
+    width: 100%
 
 .gallery__img--portrait
-  display: block
-  height: 100%
-  margin: auto
-  width: auto
+  &, & > img
+    display: block
+    height: 100%
+    margin: auto
+    width: auto
 
 .gallery__title
-  +font-size(24)
+  +font-size(20)
   color: $body-copy
   padding-bottom: 10px
-  .responsive &
-    +font-size(20)
-    +respond-to(768)
-      +font-size(22)
-    +respond-to(1000)
-      +font-size(24)
+  +respond-to(768)
+    +font-size(22)
+  +respond-to(1000)
+    +font-size(24)
 
 .gallery__breadcrumb
-  +font-size(14)
-  font-weight: bold
-  line-height: 2
-  text-transform: uppercase
-  .responsive &
-    +font-size(11)
-    line-height: 1
-    +respond-to(480)
-      +font-size(12)
-    +respond-to(768)
-      +font-size(14)
-    +respond-to(1000)
-      line-height: 2
-
-  &:before
-    +size(14px)
-    display: inline-block
-    vertical-align: middle
-
-.gallery__breadcrumb-item
-  color: $body-copy
-  &:after
-    content: " / "
-  &:last-child:after
-    content: ""
+  position: relative
 
 .gallery__footer
-  +slide-width()
   background: white
   margin: auto
   min-height: $footer-height
   overflow: hidden
 
+.gallery__footer__wrapper
+  +respond-to(wide-view)
+    max-width: 1000px
+    overflow: hidden
+    margin: 0 auto
+    position: relative
+
 .gallery__description
-  +slide-width(- $ad-width)
+  +z-layer
   background: white
   border-radius: 0 0 0 4px
-  box-sizing: border-box
-  float: left
+  max-width: 50em
   min-height: $footer-height
   padding: 20px 20px 0 20px
   position: relative
+  +respond-to(wide-view)
+    padding-right: 20px + $ad-width
 
 .gallery__social .sharing
   padding: 10px 0 20px 0
@@ -146,6 +123,7 @@ $slide-width: 1000px
     display: none
   .sharing__label
     display: none
+  .social,
   .facebook-like
     margin-left: 0
 
@@ -179,11 +157,6 @@ $slide-width: 1000px
   margin-left: 9px
   padding: 5px 10px 5px 15px
   width: 95%
-  .responsive &
-    +respond-to(480)
-      width: $slide-width-phone - 50px
-    +respond-to(768)
-      width: 95%
 
   @for $i from 1 through length($poi-names)
     $type: nth($poi-names, $i)
@@ -196,20 +169,23 @@ $slide-width: 1000px
   font-weight: bold
 
 .gallery__mpu
-  background: white
-  display: block
-  float: left
-  height: $footer-height
+  +z-layer(middle)
+  display: none
   width: $ad-width
-  .responsive &
-    display: none
-    +respond-to(480)
-      display: block
+  height: $footer-height
+  background: white
+  +respond-to(strip-unit($ad-width))
+    display: block
+    margin: 0 auto 20px
+  +respond-to(wide-view)
+    margin: 0
+    position: absolute
+    right: 0
+    top: 0
 
 .gallery-underlay
   +z-layer(middle)
-  background: $body-background
-  background: rgba($body-background, 0.95)
+  +alpha-background($body-background, 0.95)
   bottom: 0
   left: 0
   opacity: 0
@@ -241,63 +217,57 @@ $slide-width: 1000px
   cursor: pointer
   opacity: .25
 
+$arrow-size: 50px
+.arrow--left,
+.arrow--right,
 .gallery__next,
 .gallery__previous
   +hardware-acceleration()
-  +z-layer(top)
-  background: #888
-  background: rgba(#000, 0.5)
-  padding: 10px 0
+  +z-layer(modal)
+  +size($arrow-size)
+  +alpha-background($darkgray, 0.15, #888)
+  border: 2px solid white
+  border-radius: $arrow-size
+  box-sizing: border-box
   display: inline-block
-  font-weight: bold
-  height: 50px
-  line-height: 50px
-  margin-top: -25px
+  margin-top: -#{$arrow-size / 2}
+  opacity: 0.7
   position: absolute
-  color: white
-  text-decoration: none
   top: 50%
-  transition: left 0.2s, right 0.2s, transform 0.2s, opacity 0.2s
-  white-space: nowrap
-  width: 120px
-  &:hover
+  transition: background 0.3s, opacity 0.3s
+  &:hover,
+  &.is-hover,
+  &:focus
+    +alpha-background($darkgray, 0.5)
+    opacity: 1
     text-decoration: none
   .supports-touch &
     display: none
 
-.gallery__next:before,
-.gallery__previous:after
+.arrow--left:after,
+.arrow--right:before
+  +size(50%)
   display: inline-block
-  height: 50px
+  left: 25%
+  position: relative
+  top: 25%
   vertical-align: top
-  width: 35px
 
-.gallery__previous
-  border-radius: 0 50px 50px 0
-  left: -70px
-  text-align: right
-  .at-beginning &
-    opacity: 0
-    pointer-events: none
-  &:after
-    margin-right: 15px
-  &:hover,
-  &.is-hover,
-  &:focus
-    left: 0
+.arrow--left
+  left: -90px
+
+.arrow--right
+  right: -90px
 
 .gallery__next
-  border-radius: 50px 0 0 50px
-  right: -70px
-  .at-end &
-    opacity: 0
-    pointer-events: none
-  &:before
-    margin-left: 15px
-  &:hover,
-  &.is-hover,
-  &:focus
-    right: 0
+  right: 20px
+  +respond-to(larger-than-ipad)
+    right: -90px
+
+.gallery__previous
+  left: 20px
+  +respond-to(larger-than-ipad)
+    left: -90px
 
 .gallery__slide-details
   display: none

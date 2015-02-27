@@ -1,41 +1,46 @@
-!!! 5
-%html{class: 'no-js no-freight', lang: "en"}
+= render 'layouts/partials/snippets/doctype_declaration'
 
-  %head
-    = render 'layouts/core/head', responsive: false, homepage: false, suppress_tynt: (defined?(suppress_tynt) ? suppress_tynt : false)
-    = stylesheet_link_tag 'styleguide', :media => "all"
+%head
+  = render 'layouts/custom/head', tynt: (defined?(tynt) ? tynt : true), responsive: false, third_party: false, include_js: true, legacy_lp: false, app_core: false, default_title: true
+  = stylesheet_link_tag 'styleguide', :media => "all"
 
-  %body
+%body
 
-    .wrapper.js-wrapper
-      .nav-container
-        .row.row--primary
-          .split--left
-            .wv--nav--inline.nav--primary#js-nav--primary
-              %a.media--lp-logo.logo--header.icon--lp-logo.icon--white{href: 'http://rizzo.lonelyplanet.com/styleguide'}
-              %h1.title--primary.title--styleguide Style Guide
+  .wrapper.js-wrapper
+    .row.row--primary
+      .row--faux-banner
 
-      .row.row--content#js-row--content
-        .row__inner.row__inner--content
+      .nav-container.m-hidden-menu
+        .split--left
+          .wv--nav--inline.nav--primary#js-nav--primary
+            %a.media--lp-logo.logo--header.icon--lp-logo.icon--white{href: 'http://rizzo.lonelyplanet.com/styleguide'}
+            - @app.primary_nav_items.each do |item|
+              %a.nav__item.nav__item--primary{ href: "#{item[:slug]}" }<
+                = item[:name]
 
-          .row.row--secondary#js-secondary-nav
-            .row__inner.row__inner--secondary
-              = yield :secondary
+    .row.row--content#js-row--content
 
-          .grid-wrapper--10
-            = ui_component('navigation/left', properties: left_nav_items)
+      .row.row--secondary#js-secondary-nav
+        .row__inner.row__inner--secondary.row__inner--full-width
+          = yield :secondary
 
-            .main-content.stack#js-main-content
-              = yield
+      .row__inner.row__inner--content
 
-        = ui_component('lightbox')
-        %script#tmpl-preloader{ type: 'text-mustache' }
-          = ui_component('preloader')
+        .grid-wrapper--10
+          - if @app.left_nav_items.present?
+            = ui_component('navigation/left', properties: @app.left_nav_items)
 
-    .js-config.is-hidden
-      = render 'layouts/core/snippets/footer_js'
-      = yield :scripts
+          .main-content.stack#js-main-content
+            = yield
 
-      = javascript_include_tag 'prism'
+      = ui_component('lightbox')
+      %script#tmpl-preloader{ type: 'text/mustache' }
+        = ui_component('preloader')
 
-    = render 'layouts/core/snippets/pointer_cover'
+  .js-config.is-hidden
+    = render 'layouts/partials/snippets/footer_js', third_party: false
+    = yield :scripts
+
+    = javascript_include_tag 'prism'
+
+  = render 'layouts/partials/snippets/pointer_cover'

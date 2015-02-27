@@ -8,11 +8,11 @@
 //
 // ------------------------------------------------------------------------------
 
-define([ "jquery", "lib/utils/template" ], function($, Template) {
+define([ "jquery", "lib/utils/template", "lib/core/user_feed" ], function($, Template, UserFeed) {
   "use strict";
 
   var Authenticator = function() {
-    this.statusUrl = "https://www.lonelyplanet.com/thorntree/users/status";
+    this.statusUrl = "https://auth.lonelyplanet.com/users/status.json";
 
     this.init();
   },
@@ -33,8 +33,8 @@ define([ "jquery", "lib/utils/template" ], function($, Template) {
       url: this.statusUrl,
       dataType: "jsonp",
       jsonpCallback: "lpUserStatusCallback",
-      error: this._updateStatus,
-      success: this._updateStatus
+      success: _this._updateStatus,
+      error: _this._updateStatus
     });
   };
 
@@ -55,13 +55,12 @@ define([ "jquery", "lib/utils/template" ], function($, Template) {
         $rendered = $(Template.render(template, window.lp.user)),
         $userAvatar;
 
-    if (window.lp.user.unreadMessageCount > 0) {
-      $rendered.find(".js-unread-messages").removeClass("is-hidden");
-    }
-
     // Remove any previously generated user navigation.
     $(".js-user-signed-in, .js-user-signed-out").remove();
     _this.templateContainer.after($rendered);
+
+    // Initiate user feed component
+    new UserFeed();
 
     $userAvatar = $(".js-user-avatar");
     $userAvatar.attr("src", $userAvatar.data("src"));

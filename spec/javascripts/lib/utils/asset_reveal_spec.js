@@ -1,4 +1,4 @@
-require(["public/assets/javascripts/lib/utils/asset_reveal.js"], function(AssetReveal) {
+define(["public/assets/javascripts/lib/utils/asset_reveal.js"], function(AssetReveal) {
 
   describe("AssetReveal", function() {
     var assetReveal;
@@ -6,12 +6,6 @@ require(["public/assets/javascripts/lib/utils/asset_reveal.js"], function(AssetR
     beforeEach(function() {
       loadFixtures("asset_reveal.html");
       assetReveal = new AssetReveal;
-    });
-
-    describe("Object", function() {
-      it("is defined", function() {
-        expect(AssetReveal).toBeDefined();
-      });
     });
 
     describe("Initialisation", function() {

@@ -5,8 +5,9 @@
 // }
 define([
   "jquery",
-  "lib/utils/asset_reveal"
-], function($) {
+  "lib/utils/asset_reveal",
+  "lib/utils/resrcit_helper"
+], function($, AssetReveal, ResrcIt) {
 
   "use strict";
 
@@ -14,31 +15,53 @@ define([
     slides: ".js-slide",
     slidesContainer: ".js-slider-container",
     slidesViewport: ".js-slider-viewport",
+    listener: "#js-row--content",
     // the number of images to load on either side of is-current
-    assetBalance: null,
-    createControls: true,
-    keyboardControl: false
+    assetBalance: 2,
+    assetReveal: false,
+    autoSlideDelay: 0,
+    keyboardControl: false,
+    loopAround: false,
+    showPagination: false,
+    showSliderControls: true,
+    transition: 200
   };
 
   function Slider(args) {
+
     this.config = $.extend({}, defaults, args);
+
     this.currentSlide = 1;
     this.$el = $(this.config.el);
     this.$slides = this.$el.find(this.config.slides);
     this.numSlides = this.$slides.length;
-    this.$el.length && this.numSlides > 2 && this.init();
+    this.$picture = this.$el.find("picture");
+    this.$el.length && this.numSlides > 1 && this.init();
   }
 
   Slider.prototype.init = function() {
+    var transform = window.lp.supports.transform && window.lp.supports.transform.css,
+        transition = this.$el.data("transition") || this.config.transition,
+        transitionString = transform + " " + transition + "ms ease-in-out 0, left " + transition + "ms ease-in-out 0",
+        currentSlideSpecified;
+
+    this.$slides.css("transition", transitionString);
+
     this._gatherElements();
     this._addClasses();
 
-    // if gatherElements finds an element called "is-current", go there.
-    if (this.$currentSlide.length) {
-      this._goToSlide(this.$slides.index(this.$currentSlide) + 1);
+    if (this.config.showSliderControls) {
+      this._showControls();
+    }
+    if (this.config.showPagination) {
+      this._showPagination();
     }
 
-    this.config.createControls && this._createControls();
+    // if gatherElements finds an element called "is-current", go there.
+    currentSlideSpecified = this.$currentSlide.length;
+    if (currentSlideSpecified) {
+      this._goToSlide(this.$slides.index(this.$currentSlide) + 1);
+    }
 
     this._updateSlideClasses();
     this._updateCount();
@@ -47,21 +70,24 @@ define([
     this.config.assetBalance && this._loadHiddenContent();
     this.$slidesViewport.removeClass("is-loading");
 
-    // TODO: Move this into the map/media-gallery js when it exists
-    this.$el.find(".js-resizer").on("click", function() {
-      return $("input[name='" + $(this).attr("for") + "']").toggleClass("is-checked");
-    });
+    if (this.config.assetReveal) {
+      this.assetReveal = new AssetReveal({ el: this.$el });
+    }
+    // This gets called in `_goToSlide`, so don't call it again.
+    if (!currentSlideSpecified) {
+      this._setupAutoSlide();
+    }
+
+    this.$listener.trigger(":slider/ready", [ this.$slides ]);
   };
 
   Slider.prototype._gatherElements = function() {
     this.$currentSlide = this.$slides.filter(".is-current");
-    this.$listener = $(this.config.$listener || "#js-row-content");
+    this.$listener = $(this.config.listener);
     this.$slidesContainer = this.$el.find(this.config.slidesContainer);
     this.$slidesViewport = this.$el.find(this.config.slidesViewport);
     this.$sliderControlsContainer = $(".js-slider-controls-container");
     this.$images = this.$slides.find("img");
-    this.$next = this.$sliderControlsContainer.find(".js-slider-next").attr("href", "");
-    this.$prev = this.$sliderControlsContainer.find(".js-slider-previous").attr("href", "");
   };
 
   Slider.prototype._handleEvents = function() {
@@ -69,26 +95,15 @@ define([
 
     this.$listener.on(":slider/next", this._nextSlide.bind(this));
     this.$listener.on(":slider/previous", this._previousSlide.bind(this));
+    this.$listener.on(":slider/goto", function(e, index) {
+      _this._goToSlide(index);
+    });
 
     this.$el.on(":swipe/left", this._nextSlide.bind(this));
     this.$el.on(":swipe/right", this._previousSlide.bind(this));
 
-    this.$next.on("click", function() {
-      _this._nextSlide();
-      return false;
-    });
-
-    this.$prev.on("click", function() {
-      _this._previousSlide();
-      return false;
-    });
-
-    this.$next.add(this.$prev).on("mouseenter click", function() {
-      _this._loadHiddenContent();
-    });
-
-    this.config.keyboardControls && $(document).on("keydown", function(event) {
-      if (event.metaKey || event.ctrlKey) { return; }
+    this.config.keyboardControl && $(document).on("keydown", function(event) {
+      if (event.metaKey || event.ctrlKey) return;
 
       switch (event.which) {
         case 37:
@@ -103,8 +118,8 @@ define([
     });
 
     this.$images.on("load", function(event) {
-      if (!this.$slides.hasClass("is-loaded")) { return; }
-      var slide = this.$slides.has(event.target);
+      if (!_this.$slides.hasClass("is-loaded")) return;
+      var slide = _this.$slides.has(event.target);
       slide.removeClass("is-loading").addClass("is-loaded");
     });
   };
@@ -121,120 +136,190 @@ define([
     }
   };
 
-  Slider.prototype._createControls = function() {
+  Slider.prototype._showControls = function() {
     var _this = this,
-        pagination = "",
-        $slideLinks;
+        $next, $prev;
 
-    this.$sliderControls = $("<div class='slider__controls no-print'></div>");
-    this.$sliderPagination = $("<div class='slider__pagination no-print'></div>");
-    this.$next = $("<a href='#' class='slider__control slider__control--next js-slider-next icon--chevron-right--before icon--white--before'>2 of " + this.numSlides + "</a>");
-    this.$prev = $("<a href='#' class='slider__control slider__control--prev js-slider-previous icon--chevron-left--after icon--white--after'>" + this.numSlides + " of " + this.numSlides + "</a>");
-    this.$sliderControls.append(this.$next, this.$prev);
-    this.$sliderControlsContainer.append(this.$sliderControls);
-    $slideLinks = this.$sliderPagination.find(".slider__pagination--link");
+    this.$sliderControlsContainer.addClass("is-shown");
+
+    $next = this.$sliderControlsContainer.find(".js-slider-next").val("");
+    $prev = this.$sliderControlsContainer.find(".js-slider-previous").val("");
+
+    $next.on("click", function() {
+      _this._nextSlide(true);
+      return false;
+    });
+
+    $prev.on("click", function() {
+      _this._previousSlide(true);
+      return false;
+    });
+
+    $next.add(this.$prev).on("mouseenter click", function() {
+      _this._loadHiddenContent();
+    });
+
+  };
+
+  Slider.prototype._showPagination = function() {
+    var _this = this;
 
     this.$slides.each(function(i) {
-      return pagination += "<a href='#' class='slider__pagination--link'>" + (i + 1) + "</a>";
-    });
-
-    this.$sliderPagination.append(pagination);
-    this.$sliderControlsContainer.append(this.$sliderPagination);
-    this._fadeControls();
-
-    $slideLinks.on({
-      click: function(e) {
-        var index = parseInt(e.target.innerHTML, 10);
-        _this.$slides.removeClass("is-potentially-next");
-        _this._goToSlide(index);
-        return false;
-      },
-
-      mouseenter: function(e) {
-        var index = parseInt(e.target.innerHTML, 10);
-        _this.$el.removeClass("is-animating");
-        _this.$slides.removeClass("is-potentially-next");
-        _this.$slides.eq(index - 1).addClass("is-potentially-next");
-        _this._loadHiddenContent();
-      },
-
-      mouseleave:  function() {
-        return _this.$slides.removeClass("is-potentially-next");
+      var $link = $("<button value='" + (i + 1) + "' class='slider__pagination--link js-slider-pagination-link'></button>");
+      if (!_this.$sliderPaginationLinks) {
+        _this.$sliderPaginationLinks = $link.addClass("is-current");
+      } else {
+        _this.$sliderPaginationLinks = _this.$sliderPaginationLinks.add($link);
       }
     });
+
+    this.$sliderPaginationLinks.on("click", function(e) {
+      _this._goToSlide(this.value);
+      e.preventDefault();
+    });
+
+    this.$sliderPagination = $("<div class='slider__pagination js-slider-pagination'></div>");
+    this.$sliderPagination.append(this.$sliderPaginationLinks);
+    this.$sliderControlsContainer.append(this.$sliderPagination);
   };
 
   Slider.prototype._loadHiddenContent = function() {
-    var slides;
+    var atBeginning = this.$sliderControlsContainer.is(".at-beginning"),
+        atEnd = this.$sliderControlsContainer.is(".at-end"),
+        config = this.config,
+        $slidesToReveal, left, right;
 
-    if (this.config.assetBalance == null) {
-      slides = this.$slides;
+    if (config.assetBalance == null) {
+      $slidesToReveal = this.$slides;
+    } else if (config.loopAround && (atBeginning || atEnd)) {
+      left = this.$slides.slice(this.numSlides - config.assetBalance, this.numSlides),
+      right = this.$slides.slice(0, config.assetBalance);
+
+      $slidesToReveal = left.add(right);
     } else {
-      var left = Math.max(this.currentSlide - this.config.assetBalance, 0),
-          right = Math.min(this.currentSlide + this.config.assetBalance, this.$slides.length);
+      left = Math.max(this.currentSlide - config.assetBalance, 0),
+      right = Math.min(this.currentSlide + config.assetBalance, this.numSlides);
 
-      slides = this.$slides.slice(left, right);
+      $slidesToReveal = this.$slides.slice(left, right);
     }
 
-    this.$el.trigger(":asset/uncomment", [ slides, "[data-uncomment]" ]);
-    this.$el.trigger(":asset/loadDataSrc", [ slides, "[data-src]" ]);
+    if (config.assetReveal) {
+      if (this.$picture.length > 0) {
+        var pictureSrc = this.$picture.find("img").attr("src"),
+            // Grab the bit of the url with the image resizing service's config.
+            picturePrefix = ResrcIt.get(pictureSrc);
+
+        $slidesToReveal.find("[data-src]").each(function() {
+          var $img = $(this),
+              // Grab the url to the original, non-resized image.
+              imgSrc = ResrcIt.strip($img.attr("data-src")),
+              newSrc = picturePrefix + imgSrc;
+
+          newSrc = ResrcIt.bestFit(newSrc, $img.closest(config.slides).data("orientation"));
+
+          $img.attr("data-src", newSrc);
+        });
+      }
+
+      this.$el.trigger(":asset/uncomment", [ $slidesToReveal, "[data-uncomment]" ]);
+      this.$el.trigger(":asset/loadDataSrc", [ $slidesToReveal, "[data-src]" ]);
+    }
   };
 
   Slider.prototype._nextSlide = function() {
-    if (this.$el.is(".at-end")) { return; }
-    this._goToSlide(this.currentSlide + 1);
+    if (this.$sliderControlsContainer.is(".at-loop-end")) {
+      if (this.config.loopAround) {
+        this._goToSlide(1);
+      }
+    } else {
+      this._goToSlide(this.currentSlide + 1);
+    }
   };
 
   Slider.prototype._previousSlide = function() {
-    if (this.$el.is(".at-beginning")) { return; }
-    this._goToSlide(this.currentSlide - 1);
+    if (this.$sliderControlsContainer.is(".at-beginning")) {
+      if (this.config.loopAround) {
+        this._goToSlide(this.numSlides);
+      }
+    } else {
+      this._goToSlide(this.currentSlide - 1);
+    }
   };
 
   Slider.prototype._goToSlide = function(index) {
-    this.currentSlide = Math.min(Math.max(index, 1), this.$slides.length);
+    this.currentSlide = Math.min(Math.max(index, 1), this.numSlides);
     this.$currentSlide = this.$slides.eq(index - 1);
+
     this._updateSlideClasses();
     this._updateCount();
     this._loadHiddenContent();
-    this.$listener.trigger(":slider/slideChanged");
+
+    if (this.config.loopAround || ( !this.config.loopAround && this.currentSlide != this.numSlides )) {
+      this._setupAutoSlide();
+    }
+
+    this.$listener.trigger(":slider/slideChanged", [ (index - 1) ]);
   };
 
   Slider.prototype._updateSlideClasses = function() {
-    var current = this.$slides.eq(this.currentSlide - 1);
+    var atBeginning, atLoopEnd,
+        current = this.$slides.eq(this.currentSlide - 1),
+        next = current.next(),
+        prev = current.prev();
+
+    this.$sliderControlsContainer.removeClass("at-beginning at-end at-loop-end");
+
+    if (this.currentSlide == 1) {
+      this.$sliderControlsContainer.addClass("at-beginning");
+      atBeginning = true;
+    } else if (this.config.loopAround && this.currentSlide == this.numSlides) {
+      this.$sliderControlsContainer.addClass("at-loop-end");
+      atLoopEnd = true;
+    } else if (this.currentSlide == this.numSlides) {
+      this.$sliderControlsContainer.addClass("at-end");
+    }
+
+    if (this.config.loopAround) {
+      if (atBeginning) {
+        prev = this.$slides.eq(this.numSlides - 1);
+      } else if (atLoopEnd) {
+        next = this.$slides.eq(0);
+      }
+    }
+
+    if (this.config.showPagination) {
+      this.$sliderPaginationLinks.removeClass("is-current").eq(this.currentSlide - 1).addClass("is-current");
+    }
 
     this.$slides.removeClass("is-hidden is-previous-previous is-previous is-current is-next is-next-next");
     current.addClass("is-current");
-    current.prev().addClass("is-previous").prev().addClass("is-previous-previous");
-    current.next().addClass("is-next").next().addClass("is-next-next");
+
+    prev.addClass("is-previous");
+    next.addClass("is-next");
+
+    if (this.$slides.length > 5) {
+      prev.prev().addClass("is-previous-previous");
+      next.next().addClass("is-next-next");
+    }
   };
 
   Slider.prototype._updateCount = function() {
     var next = this.$sliderControlsContainer.find(".js-slider-next"),
         previous = this.$sliderControlsContainer.find(".js-slider-previous"),
         currentHTML = next.html() || "",
-        nextIndex = Math.min(this.currentSlide + 1, this.$slides.length),
+        atLoopEnd = this.$sliderControlsContainer.is(".at-loop-end"),
+        nextIndex =  atLoopEnd ? 1 : Math.min(this.currentSlide + 1, this.numSlides),
         prevIndex = Math.max(this.currentSlide - 1, 1);
-
-    this.$sliderControlsContainer.removeClass("at-beginning at-end");
-
-    if (this.currentSlide == 1) {
-      this.$sliderControlsContainer.addClass("at-beginning");
-    } else if (this.currentSlide == this.$slides.length) {
-      this.$sliderControlsContainer.addClass("at-end");
-    }
 
     next.html(currentHTML.replace(/([0-9]+)/, nextIndex));
     previous.html(currentHTML.replace(/([0-9]+)/, prevIndex));
-    this.$sliderControlsContainer.find(".slider__pagination--link.is-active").removeClass("is-active");
-    this.$sliderControlsContainer.find(".slider__pagination--link").eq(this.currentSlide - 1).addClass("is-active");
   };
 
-  Slider.prototype._fadeControls = function() {
-    var _this = this;
-
-    setTimeout(function() {
-      _this.$sliderControls.addClass("is-faded-out");
-    }, 1000);
+  Slider.prototype._setupAutoSlide = function() {
+    if (this.config.autoSlideDelay > 0) {
+      window.clearTimeout(this.autoSlideTimeout);
+      this.autoSlideTimeout = window.setTimeout(this._nextSlide.bind(this), this.config.autoSlideDelay);
+    }
   };
 
   return Slider;

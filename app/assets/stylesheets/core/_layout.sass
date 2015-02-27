@@ -1,25 +1,5 @@
-// ----------------------------------------------------------------------------
-//
-// Body
-//
-// The below two lines (display, min-width) fix the background colours not stretching the
-// full page width on a small screen size
-//
-// Homepage is removed from this hack because it interferes with overflow-x
-// ----------------------------------------------------------------------------
-
 body
   background-color: $body-background
-  display: table
-  min-width: 100%
-  &.responsive
-    display: block
-
-.overthrow-enabled
-  .overthrow
-    overflow: auto
-    -webkit-overflow-scrolling: touch
-
 
 
 // -----------------------------------------------------------------------------
@@ -30,16 +10,13 @@ body
 
 .grid--main-layout
 
-  .responsive &
-    margin-left: 0
+  +respond-to(wide-view)
+    margin-left: -10px
+
+  > [class*="col--"]
+    padding-left: 0
     +respond-to(wide-view)
-      margin-left: -10px
-
-    > [class*="col--"]
-      padding-left: 0
-      +respond-to(wide-view)
-        padding-left: 10px
-
+      padding-left: 10px
 
 // ----------------------------------------------------------------------------
 //
@@ -54,19 +31,30 @@ body
   @extend %clearfix
   margin: 0 auto
   position: relative
-  width: $fixed-layout-width
-  .responsive &
-    width: 90%
-    +respond-to(wide-view)
-      max-width: $fixed-layout-width
+  padding-left: $layout-gutter
+  padding-right: $layout-gutter
+  width: auto
+
+  +respond-to(wide-view)
+    width: $fixed-layout-width
+
+  .layout--fluid &
+    width: $fluid-layout-width
+
+  .layout--ad-rail &
+    width: auto
+    max-width: $adrail-layout-width
 
   &.row__inner--full-width
-    width: 100%
+    padding-left: 0
+    padding-right: 0
+
+.row__inner--content
+  padding-top: 15px
 
 .row--text-centered
   text-align: center
   .row__inner
-    width: 95%
     +respond-to(wide-view)
       width: 600px
 
@@ -83,13 +71,6 @@ body
     position: absolute
     right: 55%
 
-.row--fluid
-  min-width: $fixed-layout-width
-  padding-left: 20px
-  padding-right: 20px
-  .responsive &
-    min-width: 0
-
 
 // ----------------------------------------------------------------------------
 //
@@ -100,18 +81,14 @@ body
 // ----------------------------------------------------------------------------
 
 .row--faux-banner
-  display: none
-  .responsive &
-    display: block
-    position: absolute
-    top: 0
-    left: 0
-    right: 0
-    background-color: $navblue
-    height: 55px
-    +respond-to(wide-view)
-      display: none
-
+  position: absolute
+  top: 0
+  left: 0
+  right: 0
+  background-color: $navblue
+  height: $primary-nav-height
+  +respond-to(wide-view)
+    display: none
 
 // ----------------------------------------------------------------------------
 //
@@ -121,14 +98,10 @@ body
 
 .row--content
   +z-layer
-  margin-bottom: 40px
+  @extend %transition--nav
   // Ensure that nav dropdowns sit above any content
   position: relative
-  .responsive &
-    @extend %transition--nav
-    padding-top: 55px
-  .homepage &
-    margin-top: 0
+  margin-bottom: 40px
 
 
 // ----------------------------------------------------------------------------

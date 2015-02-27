@@ -1,11 +1,25 @@
 .icon--bold--before:before, .icon--bold--after:after,
 .icon--bold { background-image: url('png/bold.png'); background-repeat: no-repeat; }
 
+.icon--book--before:before, .icon--book--after:after,
+.icon--book { background-image: url('png/book.png'); background-repeat: no-repeat; }
+
 .icon--by--before:before, .icon--by--after:after,
 .icon--by { background-image: url('png/by.png'); background-repeat: no-repeat; }
 
 .icon--cc--before:before, .icon--cc--after:after,
 .icon--cc { background-image: url('png/cc.png'); background-repeat: no-repeat; }
+
+.picker__nav--prev,
+.icon--chevron-left--before:before, .icon--chevron-left--after:after,
+.icon--chevron-left { background-image: url('png/chevron-left.png'); background-repeat: no-repeat; }
+
+.picker__nav--next,
+.icon--chevron-right--before:before, .icon--chevron-right--after:after,
+.icon--chevron-right { background-image: url('png/chevron-right.png'); background-repeat: no-repeat; }
+
+.icon--cross--before:before, .icon--cross--after:after,
+.icon--cross { background-image: url('png/cross.png'); background-repeat: no-repeat; }
 
 .icon--entertainment--before:before, .icon--entertainment--after:after,
 .icon--entertainment { background-image: url('png/entertainment.png'); background-repeat: no-repeat; }
@@ -21,6 +35,9 @@
 
 .icon--hamburger--before:before, .icon--hamburger--after:after,
 .icon--hamburger { background-image: url('png/hamburger.png'); background-repeat: no-repeat; }
+
+.icon--ipad--before:before, .icon--ipad--after:after,
+.icon--ipad { background-image: url('png/ipad.png'); background-repeat: no-repeat; }
 
 .icon--italics--before:before, .icon--italics--after:after,
 .icon--italics { background-image: url('png/italics.png'); background-repeat: no-repeat; }
@@ -66,6 +83,9 @@
 
 .icon--top-choice--before:before, .icon--top-choice--after:after,
 .icon--top-choice { background-image: url('png/top-choice.png'); background-repeat: no-repeat; }
+
+.icon--top-pick--before:before, .icon--top-pick--after:after,
+.icon--top-pick { background-image: url('png/top-pick.png'); background-repeat: no-repeat; }
 
 .icon--trash--before:before, .icon--trash--after:after,
 .icon--trash { background-image: url('png/trash.png'); background-repeat: no-repeat; }

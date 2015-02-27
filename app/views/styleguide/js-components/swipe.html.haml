@@ -4,7 +4,7 @@
   .clearfix
     %h1.copy--h1 Swipe
 
-    %p 
+    %p
       A cross platform component that announces left and right swiping events
       without disabling up and down scrolling on the elements. Just add the
       %code js-onswipe
@@ -14,7 +14,7 @@
       %code :swipe/right
       \.
 
-    .btn.btn--icon.icon--ipad--before.icon--white--before.js-onswipe.js-swipe-me
+    .btn.btn--linkblue.btn--large.btn--icon.icon--ipad--before.icon--white--before.js-onswipe.js-swipe-me
       swipe me
 
 .styleguide-block.styleguide-block__description.card.copy--body
@@ -24,8 +24,9 @@
 
   %pre.styleguide.copy--body.language-markup
     %code
-      :escaped
-        <article class="eggs js-onswipe" data-threshold="10"></article>
+      = preserve do
+        :escaped
+          <article class="eggs js-onswipe" data-threshold="10"></article>
 
   %p
     You can also add the

@@ -4,7 +4,7 @@
 //
 // ------------------------------------------------------------------------------
 
-define([ "jquery", "pickadate/lib/picker", "pickadate/lib/picker.date", "pickadate/lib/legacy" ], function($) {
+define([ "jquery", "picker", "pickerDate", "pickerLegacy" ], function($) {
 
   "use strict";
 
@@ -82,7 +82,7 @@ define([ "jquery", "pickadate/lib/picker", "pickadate/lib/picker.date", "pickada
       if (!this._isValidEndDate()) {
         this.outDate.data("pickadate").set("select", new Date(date).getTime() + this.day);
       }
-      this.inLabel.text(date);
+      this.inLabel.text(this.inDate.val());
     } else if (type === "end") {
       if (!this._isValidEndDate() || this.firstTime) {
         this.inDate.data("pickadate").set("select", new Date(date).getTime() - this.day);

@@ -4,8 +4,10 @@
 //
 // ----------------------------------------------------------------------------
 
-input, textarea
+input, textarea, button
   @extend %lp-font-stack
+
+input, textarea
   box-sizing: border-box
   border: none
   outline: 0
@@ -41,6 +43,17 @@ input[type="submit"]
       background-color: #fff
       border: 1px solid $details-panel-border
 
+.input--regular--dark
+  box-sizing: border-box
+  word-wrap: break-word
+  font-weight: bold
+  background-color: $body-background-offset
+  border: 1px solid $body-background-offset
+  box-shadow: 1px 1px 1px rgba($row-primary--darker, 0.2)
+  display: block
+  padding: 10px 40px 10px 10px
+  border-radius: 4px
+
 // ----------------------------------------------------------------------------
 //
 // Header: Search Form
@@ -48,88 +61,155 @@ input[type="submit"]
 // ----------------------------------------------------------------------------
 
 .search--primary
-  border-radius: 16px
-  background-color: $row-primary--darker
-  overflow: hidden
-  margin: 12px 0 0
+  background-color: transparent
+  position: relative
+  width: 75%
+  margin: 12px auto 0
+
+  +respond-to(wide-view)
+    width: auto
+    margin: 10px 0
+
   @if $is-ie
     float: left
-  .responsive &
-    background-color: white
-    width: 75%
-    margin: 12px auto 0
-    +respond-to(wide-view)
-      background-color: $row-primary--darker
-      width: auto
-      margin: 12px 0 0
 
 .search--primary--mobile
-  display: none
-  .responsive &
-    display: block
-    +respond-to(wide-view)
-      display: none
+  +respond-to(wide-view)
+    display: none
 
 .search--primary--wv
-  @extend %inline-block
-  .responsive &
-    display: none
-    +respond-to(wide-view)
-      display: inline-block
+  display: none
+  +respond-to(wide-view)
+    display: inline-block
 
 .search__input--primary
-  @extend %transition--base
-  background: transparent
+  transition: width 0.2s ease, background-color 0.2s ease
+  border-radius: 16px
+  background-color: $row-primary--darker
   color: $nav-primary-type
   display: inline-block
-  height: 30px
+  height: 35px
   padding: 0 10px
   vertical-align: top
-  width: 170px
   &:focus
-    box-shadow: 0 1px 3px 1px rgba(0, 0, 0, 0.2) inset
-    background: white
     color: $body-copy
-    width: 210px
-  .responsive &
-    width: 80%
+    box-shadow: none
+    background-color: white
+    background-position: right 6px top -24px
+    +placeholder
+      color: $body-copy
+
+  +respond-to(wide-view)
+    width: 150px
     &:focus
-      width: 80%
-      box-shadow: none
-    +respond-to(wide-view)
-      width: 170px
-      &:focus
-        width: 210px
-        box-shadow: 0 1px 3px 1px rgba(0, 0, 0, 0.2) inset
+      width: 150px
+    +placeholder()
+      text-indent: -9999px
+
+  +respond-to(larger-than-ipad)
+    width: 150px
+    &:focus
+      width: 200px
+    +placeholder()
+      text-indent: 0
+
+
+  +placeholder()
+    color: $row-primary--darker
 
   .ie8 &
     line-height: 16px
     padding: 7px 10px
+    width: 100px !important
 
-.search__button
-  @extend %transition--base
+.search__input__icon
+  @extend %image-replacement
+  +size(22px)
+  display: block
+  padding: 0
+  opacity: 0.75
+  background-size: cover
+  position: absolute
+  right: 8px
+  top: 6px
   background-color: transparent
   border: 0
   cursor: pointer
-  height: 30px
-  padding: 0
-  vertical-align: top
-  &:hover
-    background-color: $header-blue
-  .responsive &
-    float: right
-    +respond-to(wide-view)
-      float: none
+  background-position: 0 -56px
+  @if $is-ie
+    +size(30px)
+    top: 2px
+    right: 2px
+    background-position: 0 -40px
+  &.active-search
+    opacity: 1
+    background-position: 0 -28px
+    @if $is-ie
+      background-position: 0 0
 
-.search__button--icon
-  @extend %image-replacement
-  display: block
-  height: 16px
-  margin: 0 8px
-  padding: 0
-  width: 16px
-  opacity: 0.7
-  background-size: 16px
+
+
+.primary-search-autocomplete
+  .autocomplete
+    position: relative
+    display: block
+    width: 100%
+    margin: 0
+    left: 0
+    top: 75%
+    .autocomplete__results
+      @extend %transition--base
+      @extend %fly-out-shadow
+      @extend %rounded-corners
+      list-style: none
+      top: 4px
+      left: 0
+      width: 100%
+      margin: 0
+      background-color: white
+      position: absolute
+      background-color: white
+      padding: 4px 0
+      +css-arrow-central(top, $size: 30px)
+      &:after
+        position: absolute
+        filter: drop-shadow(0 -1px 0 rgba(0,0,0,.3))
+      .btn--small
+        width: 90%
+        margin: 13px auto
+        padding-top: 9px
+        padding-bottom: 8px
+        display: block
+        text-transform: uppercase
+        +font-size(13)
+
+      .autocomplete__results__item
+        cursor: pointer
+        +font-size(14)
+        color: $titlegray
+        display: block
+        padding: 12px 12px 12px 39px
+        font-weight: normal
+        background-repeat: no-repeat
+        background-size: auto 100%
+        cursor: pointer
+        border-bottom: 1px solid $subduedgray
+        position: relative
+        text-decoration: none
+        &:last-child
+          border: 0
+        &:before
+          width: 20px
+          height: 20px
+          position: absolute
+          top: 8px
+          left: 9px
+        &:hover
+          background: $body-background-offset
+        &.autocomplete__results__item--highlight
+          background: $body-background-offset
+        .autocomplete__search-term--highlight
+          font-weight: bold
 
 // -----------------------------------------------------------------------------
 //
@@ -138,12 +218,11 @@ input[type="submit"]
 // -----------------------------------------------------------------------------
 
 .form--language
-  .responsive &
-    text-align: center
-    label
-      text-align: left
-    +respond-to(wide-view)
-      text-align: left
+  text-align: center
+  label
+    text-align: left
+  +respond-to(wide-view)
+    text-align: left
 
 .form--language__label
   margin-right: 10px
@@ -162,8 +241,6 @@ input[type="submit"]
   border: none
   // Container is large enough so we can remove new formatting context
   overflow: visible
-  .responsive &
-    top: 0
 
 .submit--language
   display: none
@@ -180,23 +257,29 @@ input[type="submit"]
 //
 // -----------------------------------------------------------------------------
 
-.newsletter--footer
+.newsletter-footer
   +font-size(14)
-  .responsive &
-    margin-bottom: 20px
-    +respond-to(wide-view)
-      margin-bottom: 0
-      width: 100%
+  margin-bottom: 20px
+  +respond-to(wide-view)
+    margin-bottom: 0
+    width: 100%
+
   .btn--green
     font-weight: bold
 
-.newsletter--placeholder
+.newsletter-footer__placeholder
   position: static
   display: block
   margin-bottom: 5px
   font-weight: bold
 
+.newsletter-footer__btn
+  width: 100%
+  +respond-to(wide-view)
+    width: auto
+
 .input--small--newsletter
+  +font-size(16) // Prevent zoom on iOS
   @extend %rounded-corners
   background-color: #fff
   color: $body-copy
@@ -205,8 +288,6 @@ input[type="submit"]
   color: $body-copy
   +placeholder()
     color: $body-copy
-  .responsive &
-    +font-size(16) // Prevent zoom on iOS
   .ie7 &
     width: auto
 
@@ -214,8 +295,7 @@ input[type="submit"]
   margin: 7px 0
 
 .dropdown__value--country
+  +font-size(16) // Prevent zoom on iOS
   border: none
   padding-top: 11px
   padding-bottom: 11px
-  .responsive &
-    +font-size(16) // Prevent zoom on iOS

@@ -1,26 +1,26 @@
 source 'https://rubygems.org'
 
-gem 'rails', '3.2.18'
+gem 'rails', '~> 4.1.8'
 gem 'haml'
 gem 'sass'
 gem 'sass-globbing'
 gem 'haml-rails'
-gem 'sass-rails', '~> 3.2.3'
-gem 'coffee-rails','3.2.2'
-gem 'coffee-script-source', '1.4.0'
-gem 'requirejs-rails', git: 'https://github.com/lonelyplanet/requirejs-rails.git'
-gem 'uglifier', '>= 1.0.3'
+gem 'sass-rails'
+gem 'coffee-rails'
+gem 'coffee-script-source'
+gem 'requirejs-rails', git: 'https://github.com/jwhitley/requirejs-rails.git'
+gem 'uglifier'
 gem 'autoprefixer-rails'
 gem 'unicorn'
 gem 'rake'
 gem 'sanitize'
 gem 'dotenv'
+gem 'redcarpet'
+gem 'image-resizer', git: 'https://github.com/lonelyplanet/image-resizer.git', require: 'image_resizer'
 
 group :test do
-  gem 'rspec', '~> 2.10.0'
-  gem 'rspec-rails'
+  gem 'rspec-rails', '~> 2.14.0'
   gem 'rubyzip', '< 1.0.0'
-
   gem 'selenium-webdriver', '2.26.0'
   gem 'capybara', '< 2.0.0'
   gem 'cucumber'
@@ -29,6 +29,8 @@ end
 
 group :development do
   gem 'better_errors'
+  gem 'binding_of_caller'
+  gem 'pry-rails'
 end
 
 group :production do

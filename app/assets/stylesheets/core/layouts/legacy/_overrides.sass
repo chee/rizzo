@@ -6,8 +6,10 @@
 // ----------------------------------------------------------------------------
 
 body
+  display: table
   min-height: 100%
-  color: $base-font-color
+  min-width: 100%
+  color: $body-copy
   background-color: #fff!important
 a
   cursor: pointer
@@ -21,11 +23,6 @@ input, textarea, select
 
 ul
   list-style-position: outside
-
-.nav--primary
-  .nav__submenu__content
-    &:after
-      top: -28px
 
 .wrapper--footer
   background-color: $body-background !important
@@ -58,12 +55,21 @@ ul
 
 .row--primary
   @extend %lp-font-stack
-  margin-bottom: 0 !important
-  font-size: 14px
+  position: relative
+  min-width: 1020px
+  z-index: 20
+
+.row--secondary
+  min-height: 0
+  // Required because row--primary and row--secondary are siblings in shop
+  z-index: 10 !important
 
 .row__inner--secondary
   padding-top: 0
   padding-bottom: 0
+
+.row--secondary .row__title--secondary
+  background: transparent
 
 .nav--primary, .nav-primary--user, .nav--secondary, .nav__submenu, .nav--primary--user
   a
@@ -71,26 +77,32 @@ ul
     &:hover
       text-decoration: none
 
+.nav__submenu__trigger--icon
+  display: none
+
+.nav--primary--user
+  .nav__item--primary
+    &.or, &.sign-in
+      padding: 19px 4px 18px
+
 .nav--primary
   line-height: 14px
+
+  .nav__submenu__button .btn
+    font-size: 14px
 
 .nav--secondary
   @extend %lp-font-stack
   line-height: 18px
 
-.nav__item--secondary
-  font-size: 13px !important
-  text-transform: none
-
 .nav__submenu__link
   &:hover
-    color: #fff
+    color: $body-copy
 
 .row--content
   // Ensure that the primary--nav dropdowns sit above mpu units
-  +z-layer
+  +z-layer(middle)
   position: relative
-  padding-top: 25px
   margin-bottom: 18px
   font-size: 12px
   background-color:  #fff!important
@@ -99,7 +111,7 @@ ul
     background-color: #000 !important
 
 .row__inner--content
-  padding: 0px!important
+  padding: 0!important
 
 .btn-submit--small
   padding: 8px 10px
@@ -219,23 +231,17 @@ body.ad-wallpaper
   padding: 0 !important
   border: none !important
 
-.nav__submenu__content
-  &:after
-    top: -17px
-
-.shop
-  .nav__submenu__link
-    border-color: $green !important
-    border-style: solid !important
-    border-width: 1px 0 !important
-
-
 .shop.noBreadCrumb
   background-image: none!important
 
 #container
   .currencyType
-    top: -43px !important
+    top: -58px !important
+
+.shop
+  .nav__submenu__link
+    border: 0 !important
+    border-bottom: 1px solid #DBE6EC !important
 
 // Statler
 .globalListControls
@@ -319,12 +325,60 @@ body.reportAbuse
 body
   font-size: 12px !important
 
-.search__input--primary
-  font-size: 15px
+.nav__item--primary
+  font-size: 13px !important
+  &.wv--hidden
+    display: none !important
 
+.primary-search-autocomplete
+  font-size: 13px !important
+.autocomplete__results__item
+  font-size: 14px !important
+.backup-button
+  font-size: 13px !important
+  &:hover
+    color: #FFF
 // Ads
 .ad-wallpaper:after
   background: none !important
 #expandableTop
   background-color: #124385
   padding: 5px 0 0
+
+// User Feed menu overrides for legacy sites (shop etc.)
+.user-feed
+  &, a, li
+    font-size: 14px !important
+  .user-feed__username
+    font-size: 22px !important
+    line-height: 22px !important
+  .user-feed__email
+    font-size: 17px !important
+    line-height: 17px !important
+  .user-feed__buttons .btn
+    font-size: 13px !important
+    line-height: 13px !important
+  .activity-list__item
+    font-size: 14px !important
+    line-height: 14px !important
+  .btn--full-width:hover
+    color: white !important
+  .btn--subtle:hover
+    border: 2px solid $grey-highlight !important
+    color: $grey-highlight !important
+  .btn.nav__tabs__btn
+    font-size: 15px !important
+    &:hover
+      border-bottom: 2px solid $linkblue !important
+
+[class^="badge--"]
+  font-size: 11px
+
+// Hide the last primary nav item in small/screen + non-responsive
+// This is only relevant for non-responsive pages.
+.nav__item--primary
+  .nav--primary:last-child
+    display: none
+
+    +respond-to(1050)
+      display: inline-block

@@ -4,45 +4,18 @@
 //
 // ----------------------------------------------------------------------------
 
-.responsive .user-basket,
 .user-basket
   position: relative
-  margin-left: 15px
-  padding: 1px 8px 12px
-  .responsive .wv--nav--inline > &.nav__item
-    display: none
-    +respond-to(wide-view)
-      display: inline-block
+  margin-left: 5px
+  padding: 4px 8px
 
 .user-basket__icon
   @extend %image-replacement
   @extend %inline-block
-  height: 28px
+  @extend %transition--base
+  height: 23px
+  width: 24px
   margin-right: 5px
-  width: 28px
-
-.nav__submenu--user
-  width: 165px
-  right: -10px
-  left: auto
-  .responsive &
-    display: none
-    +respond-to(wide-view)
-      &:hover
-        display: block
-
-.nav__submenu__content--user
-  &:before
-    left: 123px
-
-.nav__submenu__item
-  position: relative
-
-.nav__submenu__notification
-  background: white
-  color: $green
-  border-radius: 4px
-  padding: 0 5px
-  position: absolute
-  right: 10px
-  top: 12px
+  opacity: 0.75
+  &:hover
+    opacity: 1

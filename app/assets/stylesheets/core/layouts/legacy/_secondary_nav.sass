@@ -1,15 +1,14 @@
 .row--secondary
   @extend %clearfix
-  box-shadow: 0 2px 1px 1px rgba(0, 0, 0, 0.1) inset
-  background: #20374f
-  padding: 11px 0
+  background: $body-background-offset
+  padding: 28px 0 14px
+  .enhanced &
+    box-shadow: 0 2px 1px 1px rgba(0, 0, 0, 0.1) inset
 
 .row__title--secondary
   @extend %prevent-text-breakouts
   @extend %lp-font-stack
   margin: 0
-  background: none
-  color: #fff
   float: left
   font-size: 28px
   line-height: 32px
@@ -37,19 +36,5 @@
   text-align: right
 
 .nav__item--secondary
-  +font-size(12)
-  @extend %inline-block
-  padding: 7px 8px 7px
-  line-height: 18px
-  color: #b0bac5
-  &:hover
-    color: #fff
-    text-decoration: none
-  &:active
-    color: #b0bac5
-  &.current
-    @extend %rounded-corners
-    background-color: $active
-    color: #fff
-
-
+  +font-size(14)
+  background: $body-background-offset

@@ -23,9 +23,12 @@ body
 
 p
   margin-bottom: 10px
+  &:last-child
+    margin-bottom: 0
 
 a
-  color: $link-color
+  @extend %prevent-text-breakouts
+  color: $linkblue
   cursor: pointer
   text-decoration: none
   &:hover
@@ -41,10 +44,7 @@ em
 // -----------------------------------------------------------------------------
 
 ::-moz-selection
-  background-color: $active
-  color: white
+  background-color: rgba($linkblue, .25)
 
 ::selection
-  background-color: $active
-  color: white
-
+  background-color: rgba($linkblue, .25)

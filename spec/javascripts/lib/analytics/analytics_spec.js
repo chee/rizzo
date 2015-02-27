@@ -1,4 +1,4 @@
-require([ "jquery", "public/assets/javascripts/lib/analytics/analytics.js" ], function($, Analytics) {
+define([ "jquery", "public/assets/javascripts/lib/analytics/analytics.js" ], function($, Analytics) {
 
   "use strict";
 
@@ -13,18 +13,6 @@ require([ "jquery", "public/assets/javascripts/lib/analytics/analytics.js" ], fu
     beforeEach(function() {
       analytics = new Analytics();
       window.s.channel = "test";
-    });
-
-    describe("Initialisation", function() {
-
-      beforeEach(function() {
-        analytics = new Analytics({});
-      });
-
-      it("is defined", function() {
-        expect(analytics).toBeDefined();
-      });
-
     });
 
     describe("Adding", function() {
@@ -71,7 +59,7 @@ require([ "jquery", "public/assets/javascripts/lib/analytics/analytics.js" ], fu
     describe("Restoring", function() {
 
       beforeEach(function() {
-        analytics.prevConfig = {foo: "bar"};
+        analytics.prevConfig = { foo: "bar" };
         analytics.config = stub;
         spyOn(analytics, "_copy");
         analytics._copy();

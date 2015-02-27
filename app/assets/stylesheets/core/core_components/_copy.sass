@@ -8,28 +8,34 @@
 .copy--h1
   @extend %heading--1
   .context--content &
-    margin-bottom: 0.8em
+    margin-bottom: 0.4em
 
 .copy--h2
   @extend %heading--2
   .context--content &
-    margin: 1.8em 0 0.9em
+    margin-bottom: 0.75em
     &:first-child
       margin-top: 0
 
 .copy--h3
   @extend %heading--3
   .context--content &
-    margin-bottom: 1em
+    margin-bottom: .9em
 
 .copy--h4
   @extend %heading--4
   .context--content &
-    margin-bottom: 1em
+    margin-bottom: .9em
 
 .copy--h5
   @extend %heading--5
 
+.copy--label
+  +font-size(13)
+  color: $lightgray
+  text-transform: uppercase
+  letter-spacing: .05em
+  font-weight: bold
 
 // -----------------------------------------------------------------------------
 // Body content
@@ -40,6 +46,7 @@
 
 .copy--body
   @extend %text--body
+  color: $body-copy
 
 // Copy with a long line length
 .copy--full-width,
@@ -57,7 +64,27 @@
   @extend %text--caption
 
 .copy--disclaimer
-  +font-size(11)
+  @extend %text--disclaimer
+
+
+// -----------------------------------------------------------------------------
+// Theming
+// -----------------------------------------------------------------------------
+
+.theme--dark
+  &,
+  .copy--h1,
+  .copy--h2,
+  .copy--h3,
+  .copy--h4,
+  .copy--h5,
+  .copy--feature
+    color: white
+
+  .copy--meta,
+  .copy--caption,
+  .copy--disclaimer
+    color: $subduedgray
 
 // -----------------------------------------------------------------------------
 // Links
@@ -69,6 +96,10 @@
   &:hover
     color: $linkblue
     text-decoration: none
+  .theme--dark &:hover
+    // Change the border to give some feedback on hover (on white text)
+    border-bottom-style: solid
+    color: inherit
 
 // -----------------------------------------------------------------------------
 // Lists
@@ -77,7 +108,7 @@
 .copy--list, ul, ol
   .context--content &
     padding-left: 1.2em
-    margin-bottom: 10px
+    margin-bottom: 15px
 
 .copy--list, ul, ol
   li
@@ -86,7 +117,7 @@
 
 .context--content ul,
 ul.copy--list
-  list-style-type: circle
+  list-style-type: square
 
 .list--alpha
   list-style-type: lower-alpha

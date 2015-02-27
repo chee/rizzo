@@ -1,23 +1,49 @@
+$fixed-width: true
+
 @import "base_helpers"
-@import "sprites/pois_sprite"
-@import "components/*"
-@import "icons/destination/*"
-@import "icons/interest/*"
-@import "icons/partners/*"
+@import "core/core_components/*"
+@import "components/**/*"
+@import "widgets/*"
+@import "icons/destination/icons"
+@import "icons/interest/icons"
+@import "icons/need-to-know/icons"
+@import "icons/weather/icons"
+@import "styleguide/perf"
 @import "prism"
+
+
+
+.supports-cssfilters
+  &.lightbox--open
+    .row--primary,
+    .row--secondary,
+    .row__inner--content,
+    .wrapper--footer
+      filter: blur(4px)
+
+    .lightbox
+      background: rgba($darkgray, 0.95)
+      .row--primary,
+      .row--secondary,
+      .row__inner--content,
+      .wrapper--footer
+        filter: none
 
 .box
   box-sizing: border-box
   padding: 20px
 
 pre[class*="language-"]
-  background: $body-background-offset
-  border-top: 1px solid #DEE2E6
-  border-bottom: 1px solid #DEE2E6
+  @extend %rounded-corners
+  background: mix($subduedgray, white, 10%)
+  border: 1px solid #DEE2E6
   box-sizing: border-box
   max-height: 200px
   overflow: auto
   padding: 1em
+
+  .context--documentation &
+    max-height: none
 
   .tag
     +font-size(16)
@@ -25,8 +51,10 @@ pre[class*="language-"]
     float: none
 
 pre[class*="language-"].styleguide
-  margin: 20px -20px 10px
-  font-size: 15px
+  margin: 20px 0 10px
+  +font-size(13)
+  .styleguide-intro &
+    padding: 15px 25px
   .styleguide-intro__inner &
     margin: 0
 
@@ -35,10 +63,13 @@ pre.styleguide.is-open
   &:after
     background: none
 
+*:not(pre) > code,
 *:not(pre) > code[class*="language-"]
-  background: $body-background-offset
+  @extend %rounded-corners
+  background: rgba($subduedgray, 0.1)
   border: 1px solid #DEE2E6
-  font-size: 1rem
+  +font-size(13)
+  font-weight: normal
   padding: .1em .3em
 
 .snippet-expand
@@ -64,8 +95,13 @@ pre.styleguide.is-open
   color: white
   padding: 10px 0
 
+.styleguide-intro,
+.styleguide-block
+  @extend %rounded-corners
+
 .styleguide-intro
   padding: 25px
+  margin-bottom: 20px
 
 .styleguide-intro__section
   margin-bottom: 20px
@@ -73,6 +109,8 @@ pre.styleguide.is-open
 .styleguide-block
   @extend %clearfix
   margin-bottom: 30px
+  &.theme--dark
+    background: $high-contrast-bg
 
 .styleguide-block__item--left
   float: left
@@ -91,13 +129,14 @@ pre.styleguide.is-open
     padding: 7px
     line-height: 1
     span, &
-      font-size: 14px
+      +font-size(14)
   .styleguide-block__items
     margin-bottom: 20px
   .styleguide-block__item
     margin: 0
   .styleguide-block__description
     min-height: 120px
+    @extend %rounded-corners
 
 .styleguide-block__badges
   .styleguide-block__item
@@ -121,23 +160,21 @@ pre.styleguide.is-open
   min-height: 40px
   margin: 20px 0
 
-.styleguide-block__item--card
-  margin-bottom: 0
-  padding: 20px
-
 .styleguide__colours
   text-align: center
   .copy--h4
     padding: 10px
   .card
-    @extend %rounded-corners
     overflow: hidden
+    code
+      white-space: nowrap
 
 .styleguide-block__item--colour
-  font-size: 13px
-  padding: 12px 0
+  +font-size(13)
+  padding: 25px 0
   color: white
   margin: 0
+  @extend %rounded-corners
 
   &.is-light
     color: $body-copy
@@ -148,6 +185,7 @@ pre.styleguide.is-open
   box-sizing: border-box
   overflow: hidden
   padding: 20px
+  @extend %rounded-corners
 
 .styleguide-block__heading
   margin-top: 0
@@ -168,11 +206,11 @@ pre.styleguide.is-open
       right: 101%
     .tooltip--right, + .tooltip--right
       left: 101%
-  .tooltip--focus
+.styleguide-block__picture
+  margin-bottom: 0
 
 .styleguide__partial
   padding: 10px 0
-  font-weight: bold
 
 .filter--links
   min-width: 200px
@@ -206,16 +244,22 @@ pre.styleguide.is-open
 
   > a:first-child
     +z-layer
+    +size(30px)
     @extend %transition--base
+    @extend %rounded-corners
     display: block
     position: absolute
-    right: 20px
-    top: 10px
-    width: 25px
-    height: 25px
-    opacity: 0.5
+    right: -35px
+    top: 20px
+    background-color: white
+    opacity: 0.7
     &:hover
       opacity: 1
+    &:after
+      +size(22px)
+      position: absolute
+      left: 5px
+      top: 4px
 
 .styleguide-grid
   .card
@@ -248,9 +292,10 @@ pre.styleguide.is-open
   .icon__name
     text-align: right
     padding: 10px
-    font-size: 12px
+    +font-size(12)
 
-.styleguide-icons--destination
+.styleguide-icons--destination,
+.styleguide-icons--interests
   .icon
     +size(100px)
     @extend %inline-block
@@ -271,12 +316,11 @@ pre.styleguide.is-open
   .svg-colourise
     width: 170px
 
-.lightbox
-  height: 600px
-  width: 800px
+.lightbox__content
+  padding-top: 50px
 
 .nav--left__item--konami
-  transition: all 0.5s ease
+  transition: height 0.5s ease
   border-bottom: 0
   height: 0
   margin: 0
@@ -297,7 +341,53 @@ pre.styleguide.is-open
 .js-onswipe
   -ms-touch-action: none
 
-.styleguide--section--social
-  .social
-    padding: 30px
-    background: white
+.styleguide-row
+  padding: 15px
+  p
+    margin-bottom: 0
+
+.hero-banner,
+.hero-banner__content,
+.hero-banner__image-story__content
+  width: 798px
+
+#select-field
+  .styleguide-block__item--2
+    .field__label
+      width: 60%
+    .field
+      width: 295px
+      .field__content
+        width: 100% !important
+
+.multi-select-0, .multi-select-1
+  width: 32.3%
+
+.multi-select-2
+  width: 35.3%
+
+#dropdown-intro
+  p
+    span
+      font-style: italic
+
+.styleguide-typography-block
+  .copy--h1,
+  .copy--h2,
+  .copy--h3,
+  .copy--h4,
+  .copy--h5
+    padding-bottom: 15px
+    border-bottom: 1px solid $body-background
+
+  code
+    float: right
+    line-height: 1.4
+
+// Ensure tags are actually in the styleguide, not over the left nav
+// Scoped to parent/child to avoid changing the behaviour inside cards
+.card__tags
+  .styleguide-block__item--left > &
+    position: static
+    .price-label
+      margin-top: 0
